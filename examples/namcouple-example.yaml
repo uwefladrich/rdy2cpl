@@ -1,0 +1,89 @@
+description: A YAML Namcouple example
+runtime: 2000
+nlogprt: "1 -2"
+coupling_time_steps:
+  -
+    &DT_ATM_OCE
+    dt: 1200
+  -
+    &DT_ATM_ICE
+    dt: 3600
+
+links:
+
+    - 
+      description: Fields sent atm --> oce
+      <<: *DT_ATM_OCE
+      source:
+        fields:
+          - fld1_a
+          - fld2_a
+        grid:
+          &GRID_ATM
+          name: grid_a
+          type: atmgrid
+          overlap: 1
+      target:
+        fields:
+          - fld1_o
+          - fld2_o
+        grid:
+          &GRID_OCE
+          name: grid_o
+          type: ocegrid
+          overlap: 0
+      transformations:
+        -
+          &TRANS_GAUSWGT_OPT_123
+          name: GAUSWGT
+          opts:
+            - gausswgt opt 1
+            - gausswgt opt 2
+            - gausswgt opt 3
+        -
+          &TRANS_CONSERV_GLBPOS
+          name: CONSERV
+          opts:
+            - GLBPOS
+
+    - 
+      description: More fields sent atm --> oce
+      <<: *DT_ATM_OCE
+      source:
+      source:
+        fields:
+          - fld3_a
+        grid: *GRID_ATM
+      target:
+        fields:
+          - fld3_o
+        grid: *GRID_OCE
+      transformations:
+        - *TRANS_GAUSWGT_OPT_123
+
+    -
+      description: Fields sent atm --> ice
+      <<: *DT_ATM_ICE
+      source:
+        fields:
+          - fld4_a
+          - fld5_a
+          - fld6_a
+        grid: *GRID_ATM
+      target:
+        fields:
+          - fld4_i
+          - fld5_i
+          - fld5_i
+        grid:
+          &GRID_ICE
+          name: grid_i
+          type: icegrid
+          overlap: 0
+      transformations:
+        -
+          &TRANS_GAUSWGT_OPT_12
+          name: GAUSWGT
+          opts:
+            - gausswgt opt 1
+            - gausswgt opt 2

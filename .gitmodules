@@ -1,0 +1,6 @@
+[submodule "oasis3-mct"]
+	path = oasis3-mct
+	url = https://gitlab.com/cerfacs/oasis3-mct.git
+[submodule "ocp-tool"]
+	path = ocp-tool
+	url = https://github.com/uwefladrich/ocp-tool.git

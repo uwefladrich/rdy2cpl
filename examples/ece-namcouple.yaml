@@ -1,0 +1,241 @@
+description: The EC-Earth4 namcouple as an example
+
+runtime: 31536000
+nlogprt: "1 0"
+nnorest: yes
+
+config_options:
+  -
+    &DT_ATM_OCE
+    dt: 2700
+  -
+    &LAG_ATM_OCE
+    lag: 2700
+
+  -
+    &RST_FILE_ATM
+    restart_file: rstat.nc
+  -
+    &RST_FILE_OCE
+    restart_file: rstos.nc
+
+links:
+  # =================================================================================================
+  # Fields send from Atmosphere to Ocean
+  # =================================================================================================
+  -
+    description: Momentum fluxes for oce and ice on U grid
+    <<: *DT_ATM_OCE
+    <<: *LAG_ATM_OCE
+    <<: *RST_FILE_ATM
+    source:
+      fields:
+        - A_TauX_oce
+        - A_TauY_oce
+        - A_TauX_ice
+        - A_TauY_ice
+      grid:
+        &GRID_ATM_IOCL
+        name: IOCL
+        type: P
+        overlap: 0
+    target:
+      fields:
+        - O_OTaux1
+        - O_OTauy1
+        - O_ITaux1
+        - O_ITauy1
+      grid:
+        name: NOUM
+        type: P
+        overlap: 2
+    transformations:
+      -
+        &TRANS_LOC_AVG
+        name: LOCTRANS
+        opts:
+          - AVERAGE
+      -
+        &TRANS_SCRIPR_GAUSWGT_D
+        name: SCRIPR
+        opts:
+          - GAUSWGT D SCALAR LATITUDE 1 9 2.0
+  -
+    description: Momentum fluxes for oce and ice on V grid
+    <<: *DT_ATM_OCE
+    <<: *LAG_ATM_OCE
+    <<: *RST_FILE_ATM
+    source:
+      fields:
+        - A_TauX_oce
+        - A_TauY_oce
+        - A_TauX_ice
+        - A_TauY_ice
+      grid: *GRID_ATM_IOCL
+    target:
+      fields:
+        - O_OTaux2
+        - O_OTauy2
+        - O_ITaux2
+        - O_ITauy2
+      grid:
+        name: NOVM
+        type: P
+        overlap: 2
+    transformations:
+      - *TRANS_LOC_AVG
+      - *TRANS_SCRIPR_GAUSWGT_D
+  -
+    description: >
+      Non-solar and solar radiation over ocean+ice, total evaporation,
+      precipitation (conserved, preserved sign)
+    <<: *DT_ATM_OCE
+    <<: *LAG_ATM_OCE
+    <<: *RST_FILE_ATM
+    source:
+      fields:
+        - A_Qns_mix
+        - A_Qs_mix
+        - A_Evap_total
+        - A_Precip_liquid
+        - A_Precip_solid
+      grid: *GRID_ATM_IOCL
+    target:
+      fields:
+        - O_QnsMix
+        - O_QsrMix
+        - OTotEvap
+        - OTotRain
+        - OTotSnow
+      grid:
+        &GRID_OCE_NOTM
+        name: NOTM
+        type: P
+        overlap: 2
+    transformations:
+      - *TRANS_LOC_AVG
+      - *TRANS_SCRIPR_GAUSWGT_D
+      -
+        &TRANS_CONSERV_GLBPOS
+        name: CONSERV
+        opts:
+          - GLBPOS opt
+  -
+    description: >
+      Solar/non-solar radiation over ice, dQns/dT, evaporation over ice (not conserved)
+    <<: *DT_ATM_OCE
+    <<: *LAG_ATM_OCE
+    <<: *RST_FILE_ATM
+    source:
+      fields:
+        - A_Qs_ice
+        - A_Qns_ice
+        - A_dQns_dT
+        - A_Evap_ice
+      grid: *GRID_ATM_IOCL
+    target:
+      fields:
+        - O_QsrIce
+        - O_QnsIce
+        - O_dQnsdT
+        - OIceEvap
+      grid: *GRID_OCE_NOTM
+    transformations:
+      - *TRANS_LOC_AVG
+      - *TRANS_SCRIPR_GAUSWGT_D
+  # =================================================================================================
+  # Fields send from Atmosphere to Runoff-mapper
+  # =================================================================================================
+  -
+    description: Runoff and Calving
+    <<: *DT_ATM_OCE
+    <<: *LAG_ATM_OCE
+    <<: *RST_FILE_ATM
+    source:
+      fields:
+        - A_Runoff
+      grid:
+        name: ILCL
+        type: P
+        overlap: 0
+    target:
+      fields:
+        - R_Runoff_atm
+      grid:
+        &GRID_RNFM_RNFA
+        name: RNFA
+        type: P
+        overlap: 0
+    transformations:
+      - *TRANS_LOC_AVG
+      - *TRANS_SCRIPR_GAUSWGT_D
+      - *TRANS_CONSERV_GLBPOS
+  # =================================================================================================
+  # Fields send from Runoff-mapper to Ocean
+  # =================================================================================================
+  -
+    description: Runoff
+    <<: *DT_ATM_OCE
+    source:
+      fields:
+        - R_Runoff_oce
+      grid: *GRID_RNFM_RNFA
+    target:
+      fields:
+        - O_Runoff
+      grid: *GRID_OCE_NOTM
+    transformations:
+      -
+        &TRANS_SCRIPR_GAUSWGT_LR
+        name: SCRIPR
+        opts:
+          - GAUSWGT LR SCALAR LATITUDE 1 9 2.0
+      - *TRANS_CONSERV_GLBPOS
+      -
+        name: BLASNEW
+        opts:
+          - "1.07945 0"
+  -
+    description: Calving
+    <<: *DT_ATM_OCE
+    source:
+      fields:
+        - R_Calving_oce
+      grid: *GRID_RNFM_RNFA
+    target:
+      fields:
+        - OCalving
+      grid: *GRID_OCE_NOTM
+    transformations:
+      - *TRANS_SCRIPR_GAUSWGT_LR
+      - *TRANS_CONSERV_GLBPOS
+  # =================================================================================================
+  # Fields send from Ocean to Atmosphere
+  # =================================================================================================
+  -
+    description: >
+      SST, ice temperature, albedo, fraction, thickness; snow thickness over ice
+    <<: *DT_ATM_OCE
+    <<: *LAG_ATM_OCE
+    <<: *RST_FILE_OCE
+    source:
+      fields:
+        - O_SSTSST
+        - O_TepIce
+        - O_AlbIce
+        - OIceFrc
+        - OIceTck
+        - OSnwTck
+      grid: *GRID_OCE_NOTM
+    target:
+      fields:
+        - A_SST
+        - A_Ice_temp
+        - A_Ice_albedo
+        - A_Ice_frac
+        - A_Ice_thickness
+        - A_Snow_thickness
+      grid: *GRID_ATM_IOCL
+    transformations:
+      - *TRANS_LOC_AVG
+      - *TRANS_SCRIPR_GAUSWGT_LR
