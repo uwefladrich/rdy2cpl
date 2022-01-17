@@ -1,4 +1,30 @@
-.mkoas.
-.activate
-.ipynb_checkpoints
-__pycache__
+# Python files
+__pycache__/
+
+# Python virtual env
+/.prpoas.
+/.activate
+/.activate-pyoasis
+
+# Python notebooks
+*.ipynb
+*.ipynb_checkpoints
+nohup.out
+
+# VS Code
+/.vscode/
+
+# Run/debug files
+namcouple
+grids.nc
+areas.nc
+masks.nc
+rmp_*.nc
+nout.*
+debug.root.*
+debug.noroot.*
+
+# Other sources
+/oasis3-mct/
+/ocp-tool/
+/pyoasis
