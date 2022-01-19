@@ -95,20 +95,20 @@ class Grid:
         return self.nx * self.ny
 
     @property
-    def cell_longitudes(self):
+    def center_longitudes(self):
         return eqdist_center_longitudes(self.nx, self.ny, self.dx)
 
     @property
-    def cell_latitudes(self):
+    def center_latitudes(self):
         return eqdist_center_latitudes(self.nx, self.ny, self.dy)
 
     @property
     def corner_longitudes(self):
-        return eqdist_corner_longitudes(self.cell_longitudes, self.dx)
+        return eqdist_corner_longitudes(self.center_longitudes, self.dx)
 
     @property
     def corner_latitudes(self):
-        return eqdist_corner_latitudes(self.cell_latitudes, self.dy)
+        return eqdist_corner_latitudes(self.center_latitudes, self.dy)
 
     @property
     def areas(self):
@@ -119,8 +119,8 @@ class Grid:
             name,
             self.nx,
             self.ny,
-            self.cell_longitudes,
-            self.cell_latitudes,
+            self.center_longitudes,
+            self.center_latitudes,
             partition=self.partition,
         )
         g.set_corners(self.corner_longitudes, self.corner_latitudes)
@@ -135,7 +135,7 @@ class Grid:
 
 class GridA(Grid):
     @property
-    def cell_longitudes(self):
+    def center_longitudes(self):
         return eqdist_center_longitudes(self.nx, self.ny, self.dx, first_lon=-180)
 
 

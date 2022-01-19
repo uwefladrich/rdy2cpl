@@ -43,11 +43,11 @@ class ReducedGaussianGrid:
         return sum(self.nlons)
 
     @property
-    def cell_latitudes(self):
+    def center_latitudes(self):
         return self._repeat(self.lats).reshape((-1, 1))
 
     @property
-    def cell_longitudes(self):
+    def center_longitudes(self):
         return self._tile(_equidistant_longitudes).reshape((-1, 1))
 
     @property
