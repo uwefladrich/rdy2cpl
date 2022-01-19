@@ -2,6 +2,8 @@ import logging
 from collections import namedtuple
 
 from prpoas.grids.base.simple import GridA, GridB
+from prpoas.grids.base.reduced_gaussian import ReducedGaussianGrid
+from prpoas.grids.base.tco import Tco159
 from prpoas.grids.couple import CoupleGrid
 
 _log = logging.getLogger(__name__)
@@ -10,14 +12,15 @@ _bgf = namedtuple(
     "BaseGridFactory",
     "type, args, kwargs, mask_mod",
     defaults=(
+        [],
         {},
         [],
     ),
 )
 
 _map = {
-    "IOCL": _bgf(GridB, (180, 90)),
-    "ILCL": _bgf(GridB, (181, 91)),
+    "IOCL": _bgf(ReducedGaussianGrid, ([60, 30, 10, -10, -30, -60], [3, 4, 6, 6, 4, 3])),
+    "ILCL": _bgf(Tco159),
     "RNFA": _bgf(GridB, (90, 45)),
     "NOUM": _bgf(GridA, (54, 18)),
     "NOVM": _bgf(GridA, (55, 19)),

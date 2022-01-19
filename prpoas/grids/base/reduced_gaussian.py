@@ -23,9 +23,9 @@ def _latitude_bounds(lats, loc):
 
 
 class ReducedGaussianGrid:
-    def __init__(self, nlons, lats):
-        self.nlons = nlons
+    def __init__(self, lats, nlons):
         self.lats = np.array(lats)
+        self.nlons = nlons
         self.mask = np.zeros(self.shape)
 
     def _repeat(self, values):
@@ -43,23 +43,12 @@ class ReducedGaussianGrid:
         return sum(self.nlons)
 
     @property
-    def cell_longitudes(self):
-        return self._tile(_equidistant_longitudes).reshape((-1, 1))
-
-    @property
     def cell_latitudes(self):
         return self._repeat(self.lats).reshape((-1, 1))
 
     @property
-    def corner_longitudes(self):
-        return np.transpose(
-            [
-                [self._tile(_equidistant_longitudes, loc="e")],
-                [self._tile(_equidistant_longitudes, loc="w")],
-                [self._tile(_equidistant_longitudes, loc="w")],
-                [self._tile(_equidistant_longitudes, loc="e")],
-            ]
-        )
+    def cell_longitudes(self):
+        return self._tile(_equidistant_longitudes).reshape((-1, 1))
 
     @property
     def corner_latitudes(self):
@@ -69,6 +58,17 @@ class ReducedGaussianGrid:
                 [self._repeat(_latitude_bounds(self.lats, loc="n"))],
                 [self._repeat(_latitude_bounds(self.lats, loc="s"))],
                 [self._repeat(_latitude_bounds(self.lats, loc="s"))],
+            ]
+        )
+
+    @property
+    def corner_longitudes(self):
+        return np.transpose(
+            [
+                [self._tile(_equidistant_longitudes, loc="e")],
+                [self._tile(_equidistant_longitudes, loc="w")],
+                [self._tile(_equidistant_longitudes, loc="w")],
+                [self._tile(_equidistant_longitudes, loc="e")],
             ]
         )
 
