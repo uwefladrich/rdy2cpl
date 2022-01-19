@@ -5,13 +5,12 @@ class CoupleGrid:
     def __init__(self, base, name):
         self.base = base
         self.name = name
-        self.partition = pyoasis.SerialPartition(self.base.nx * self.base.ny)
+        self.partition = pyoasis.SerialPartition(self.base.size)
 
     def write(self):
         oas_grid = pyoasis.Grid(
             self.name,
-            self.base.nx,
-            self.base.ny,
+            *self.base.shape,
             self.base.cell_longitudes,
             self.base.cell_latitudes,
         )

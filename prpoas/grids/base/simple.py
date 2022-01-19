@@ -87,6 +87,14 @@ class Grid:
         self.angles = np.zeros((self.nx, self.ny), dtype=np.float64)
 
     @property
+    def shape(self):
+        return (self.nx, self.ny)
+
+    @property
+    def size(self):
+        return self.nx * self.ny
+
+    @property
     def cell_longitudes(self):
         return eqdist_center_longitudes(self.nx, self.ny, self.dx)
 

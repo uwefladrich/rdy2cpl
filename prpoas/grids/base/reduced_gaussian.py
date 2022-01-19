@@ -25,15 +25,21 @@ class ReducedGaussianGrid:
     def __init__(self, nlons, lats):
         self.nlons = nlons
         self.lats = np.array(lats)
-        self.nx = sum(self.nlons)
-        self.ny = 1
-        self.mask = np.zeros((self.nx, self.ny))
+        self.mask = np.zeros(self.shape)
 
     def _repeat(self, values):
         return np.block([np.repeat(v, n) for v, n in zip(values, self.nlons)])
 
     def _tile(self, func, *args, **kwargs):
         return np.block([func(n, *args, **kwargs) for n in self.nlons])
+
+    @property
+    def shape(self):
+        return (sum(self.nlons), 1)
+
+    @property
+    def size(self):
+        return sum(self.nlons)
 
     @property
     def cell_longitudes(self):
