@@ -1,24 +1,25 @@
 import numpy as np
 
-from .utils import EARTH_RADIUS
+from .utils import EARTH_RADIUS, equidistant, interval_bounds
 
 
 def _equidistant_longitudes(n, loc="c"):
+    lons = equidistant(0, 360, n, center_at_start=True)
     if loc in ("c", "center"):
-        return np.linspace(0, 360, n + 1)[:-1]
-    bounds = np.linspace(0, 360, 2 * n + 1)[1::2]
-    if loc in ("e", "east"):
-        return bounds
-    if loc in ("w", "west"):
-        return np.roll(bounds, 1)
+        return lons
+    elif loc in ("w", "west"):
+        return interval_bounds(0, lons, 360, loc="l", wrap=True)
+    elif loc in ("e", "east"):
+        return interval_bounds(0, lons, 360, loc="r")
+    raise ValueError(f'Invalid value for loc argument: "{loc}"')
 
 
 def _latitude_bounds(lats, loc):
-    centers = 0.5 * (lats[:-1] + lats[1:])
-    if loc in ("s", "south"):
-        return np.array((*centers, -90))
-    elif loc in ("n", "north"):
-        return np.array((90, *centers))
+    if loc in ("n", "north"):
+        return interval_bounds(90, lats, -90, loc="l")
+    elif loc in ("s", "south"):
+        return interval_bounds(90, lats, -90, loc="r")
+    raise ValueError(f'Invalid value for loc argument: "{loc}"')
 
 
 class ReducedGaussianGrid:
