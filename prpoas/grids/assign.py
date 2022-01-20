@@ -22,9 +22,9 @@ _map = {
     "IOCL": _bgf(Tco159),
     "ILCL": _bgf(Tco159),
     "RNFA": _bgf(EquidistantLatLonGrid, (360, 180)),
-    "NOUM": _bgf(OrcaUGrid, ("examples/domain_cfg")),
-    "NOVM": _bgf(OrcaVGrid, ("examples/domain_cfg")),
-    "NOTM": _bgf(OrcaTGrid, ("examples/domain_cfg")),
+    "NOUM": _bgf(OrcaUGrid, ("examples/domain_cfg.nc",)),
+    "NOVM": _bgf(OrcaVGrid, ("examples/domain_cfg.nc",)),
+    "NOTM": _bgf(OrcaTGrid, ("examples/domain_cfg.nc",)),
 }
 
 
