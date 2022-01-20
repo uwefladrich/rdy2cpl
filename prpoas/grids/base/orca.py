@@ -104,9 +104,9 @@ class OrcaGrid:
     def corner_longitudes(self, subgrid):
         _check(subgrid)
         lon_var = {
-            "t": "gphif",
-            "u": "gphiv",
-            "v": "gphiu",
+            "t": "glamf",
+            "u": "glamv",
+            "v": "glamu",
         }
         with Dataset(self.domain_cfg) as nc:
             lon_values = nc.variables[lon_var[subgrid]][0, ...].data.T
