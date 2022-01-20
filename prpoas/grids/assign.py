@@ -1,8 +1,8 @@
 import logging
 from collections import namedtuple
 
-from prpoas.grids.base.simple import GridA, GridB
-from prpoas.grids.base.reduced_gaussian import ReducedGaussianGrid
+from prpoas.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
+from prpoas.grids.base.regular import EquidistantLatLonGrid
 from prpoas.grids.base.tco import Tco159
 from prpoas.grids.couple import CoupleGrid
 
@@ -19,12 +19,12 @@ _bgf = namedtuple(
 )
 
 _map = {
-    "IOCL": _bgf(ReducedGaussianGrid, ([60, 30, 10, -10, -30, -60], [3, 4, 6, 6, 4, 3])),
+    "IOCL": _bgf(Tco159),
     "ILCL": _bgf(Tco159),
-    "RNFA": _bgf(GridB, (90, 45)),
-    "NOUM": _bgf(GridA, (54, 18)),
-    "NOVM": _bgf(GridA, (55, 19)),
-    "NOTM": _bgf(GridA, (56, 18)),
+    "RNFA": _bgf(EquidistantLatLonGrid, (360, 180)),
+    "NOUM": _bgf(OrcaUGrid, ("examples/domain_cfg")),
+    "NOVM": _bgf(OrcaVGrid, ("examples/domain_cfg")),
+    "NOTM": _bgf(OrcaTGrid, ("examples/domain_cfg")),
 }
 
 
