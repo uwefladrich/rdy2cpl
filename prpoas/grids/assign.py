@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from prpoas.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
 from prpoas.grids.base.regular import EquidistantLatLonGrid
-from prpoas.grids.base.tco import Tco159
+from prpoas.grids.base.tco import Tco95
 from prpoas.grids.couple import CoupleGrid
 
 _log = logging.getLogger(__name__)
@@ -19,8 +19,8 @@ _bgf = namedtuple(
 )
 
 _map = {
-    "IOCL": _bgf(Tco159),
-    "ILCL": _bgf(Tco159),
+    "IOCL": _bgf(Tco95),
+    "ILCL": _bgf(Tco95),
     "RNFA": _bgf(EquidistantLatLonGrid, (360, 180)),
     "NOUM": _bgf(OrcaUGrid, ("examples/domain_cfg.nc",)),
     "NOVM": _bgf(OrcaVGrid, ("examples/domain_cfg.nc",)),
