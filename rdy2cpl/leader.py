@@ -1,7 +1,7 @@
 import logging
 
 import pyoasis
-from prpoas.grids.assign import couple_grid
+from rdy2cpl.grids.assign import couple_grid
 
 _log = logging.getLogger(__name__)
 

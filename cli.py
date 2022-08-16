@@ -5,9 +5,9 @@ import yaml
 from mpi4py import MPI
 
 import pyoasis
-from prpoas.leader import lead
-from prpoas.namcouple import from_dict, reduce
-from prpoas.worker import work
+from rdy2cpl.leader import lead
+from rdy2cpl.namcouple import from_dict, reduce
+from rdy2cpl.worker import work
 
 _log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

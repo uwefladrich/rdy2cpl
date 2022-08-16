@@ -1,4 +1,4 @@
-from prpoas.grids.base.reduced_gaussian import ReducedGaussianGrid
+from rdy2cpl.grids.base.reduced_gaussian import ReducedGaussianGrid
 
 
 class Tco95(ReducedGaussianGrid):

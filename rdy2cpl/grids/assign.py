@@ -1,10 +1,10 @@
 import logging
 from collections import namedtuple
 
-from prpoas.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
-from prpoas.grids.base.regular import EquidistantLatLonGrid
-from prpoas.grids.base.tco import Tco95
-from prpoas.grids.couple import CoupleGrid
+from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
+from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
+from rdy2cpl.grids.base.tco import Tco95
+from rdy2cpl.grids.couple import CoupleGrid
 
 _log = logging.getLogger(__name__)
 
