@@ -98,6 +98,7 @@ def reduce(nmcpl):
         description=(
             f"Reduced version of '{nmcpl.description}'" if nmcpl.description else None
         ),
+        nlogprt = "0 0",
         links=[],
     )
     unique_links = []
