@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
 from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
-from rdy2cpl.grids.base.tco import Tco95
+from rdy2cpl.grids.base.tco import Tco95, Tco159
 from rdy2cpl.grids.couple import CoupleGrid
 
 _log = logging.getLogger(__name__)
@@ -21,6 +21,8 @@ _bgf = namedtuple(
 _map = {
     "IOCL": _bgf(Tco95),
     "ILCL": _bgf(Tco95),
+    "IOCM": _bgf(Tco159),
+    "ILCM": _bgf(Tco159),
     "RNFA": _bgf(EquidistantLatLonGrid, (360, 180)),
     "NOUM": _bgf(OrcaUGrid, ("examples/domain_cfg.nc",)),
     "NOVM": _bgf(OrcaVGrid, ("examples/domain_cfg.nc",)),
