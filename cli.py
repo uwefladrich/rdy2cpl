@@ -1,11 +1,10 @@
 import logging
 import sys
 
+import pyoasis
 import yaml
 from mpi4py import MPI
 
-import pyoasis
-from rdy2cpl.leader import lead
 from rdy2cpl.namcouple import from_dict, reduce
 from rdy2cpl.worker import work
 
@@ -26,25 +25,21 @@ def main():
     global_rank = MPI.COMM_WORLD.Get_rank()
     global_size = MPI.COMM_WORLD.Get_size()
 
-    i_am_leader = global_rank == 0
-    i_am_worker = 0 < global_rank <= len(namcouple.links)
+    i_am_worker = 0 <= global_rank < len(namcouple.links)
 
-    if i_am_leader:
-        if global_size <= len(namcouple.links):
-            _log.error(
-                f"Not enough workers ({len(namcouple.links)} needed, {global_size-1} present)"
-            )
-            raise RuntimeError("Not enough workers")
-        with open("namcouple", "w") as f:
-            f.write(namcouple.out)
+    if global_size < len(namcouple.links):
+        _log.error(
+            f"Not enough workers ({len(namcouple.links)} needed, {global_size} present)"
+        )
+        raise RuntimeError("Not enough workers")
+
+    with open("namcouple", "w") as f:
+        f.write(namcouple.out)
 
     MPI.COMM_WORLD.Barrier()
 
-    if i_am_leader:
-        lead(namcouple.links)
-
-    elif i_am_worker:
-        work(global_rank - 1, namcouple.links[global_rank - 1])
+    if i_am_worker:
+        work(global_rank, namcouple.links[global_rank])
 
     else:
         do_nothing(global_rank)
