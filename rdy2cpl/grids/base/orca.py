@@ -93,12 +93,37 @@ class OrcaGrid:
         with Dataset(self.domain_cfg) as nc:
             lat_values = nc.variables[lat_var[subgrid]][0, ...].data.T
         corner_lats = np.full((*self.shape, 4), _MISSING_VALUE)
-        if subgrid in ("t", "u"):
-            corner_lats[:, :, 0] = corner_lats[:, :, 1] = lat_values
-            corner_lats[:, 1:, 2] = corner_lats[:, 1:, 3] = lat_values[:, :-1]
+
+        if subgrid in ("t"):
+            corner_lats[:, :, 0] = lat_values
+            corner_lats[1:, :, 1] = lat_values[:-1, :]
+            corner_lats[0, :, 1] = lat_values[-1, :]
+            corner_lats[:, 1:, 3] = lat_values[:, :-1]
+            corner_lats[:, 0, 3] = 2 * lat_values[:, 1] - lat_values[:, 2]
+            corner_lats[1:, 1:, 2] = lat_values[:-1, :-1]
+            corner_lats[0, 1:, 2] = lat_values[-1, :-1]
+            corner_lats[1:, 0, 2] = 2 * lat_values[:-1, 1] - lat_values[:-1, 2]
+            corner_lats[0, 0, 2] = 2 * lat_values[-1, 1] - lat_values[-1, 2]
+        elif subgrid == "u":
+            corner_lats[:, :, 1] = lat_values
+            corner_lats[:-1, :, 0] = lat_values[1:, :]
+            corner_lats[-1, :, 0] = lat_values[0, :]
+            corner_lats[:, 1:, 2] = lat_values[:, :-1]
+            corner_lats[:, 0, 2] = 2 * lat_values[:, 1] - lat_values[:, 2]
+            corner_lats[:-1, 1:, 3] = lat_values[1:, :-1]
+            corner_lats[-1, 1:, 3] = lat_values[0, :-1]
+            corner_lats[:-1, 0, 3] = 2 * lat_values[1:, 1] - lat_values[1:, 2]
+            corner_lats[-1, 0, 3] = 2 * lat_values[0, 1] - lat_values[0, 2]
         elif subgrid == "v":
-            corner_lats[:, :-1, 0] = corner_lats[:, :-1, 1] = lat_values[:, 1:]
-            corner_lats[:, :, 2] = corner_lats[:, :, 3] = lat_values
+            corner_lats[:, :-1, 0] = lat_values[:, 1:]
+            corner_lats[:, -1, 0] = lat_values[:, 0]
+            corner_lats[1:, :-1, 1] = lat_values[:-1, 1:]
+            corner_lats[1:, -1, 1] = lat_values[:-1, 0]
+            corner_lats[0, :-1, 1] = lat_values[-1, 1:]
+            corner_lats[0, -1, 1] = lat_values[-1, 0]
+            corner_lats[1:, :, 2] = lat_values[:-1, :]
+            corner_lats[0, :, 2] = lat_values[-1, :]
+            corner_lats[:, :, 3] = lat_values
         return corner_lats
 
     def corner_longitudes(self, subgrid):
@@ -111,14 +136,36 @@ class OrcaGrid:
         with Dataset(self.domain_cfg) as nc:
             lon_values = nc.variables[lon_var[subgrid]][0, ...].data.T
         corner_lons = np.full((*self.shape, 4), _MISSING_VALUE)
-        if subgrid in ("t", "v"):
-            corner_lons[:, :, 0] = corner_lons[:, :, 3] = lon_values
-            corner_lons[:, :, 1] = corner_lons[:, :, 2] = np.roll(lon_values, 1, axis=0)
+
+        if subgrid in ("t"):
+            corner_lons[:, :, 0] = lon_values
+            corner_lons[1:, :, 1] = lon_values[:-1, :]
+            corner_lons[0, :, 1] = lon_values[-1, :]
+            corner_lons[:, 1:, 3] = lon_values[:, :-1]
+            corner_lons[:, 0, 3] = lon_values[:, 1]
+            corner_lons[1:, 1:, 2] = lon_values[:-1, :-1]
+            corner_lons[0, 1:, 2] = lon_values[-1, :-1]
+            corner_lons[1:, 0, 2] = lon_values[:-1, 1]
+            corner_lons[0, 0, 2] = lon_values[-1, 1]
         elif subgrid == "u":
-            corner_lons[:, :, 0] = corner_lons[:, :, 3] = np.roll(
-                lon_values, -1, axis=0
-            )
-            corner_lons[:, :, 1] = corner_lons[:, :, 2] = lon_values
+            corner_lons[:, :, 1] = lon_values
+            corner_lons[:-1, :, 0] = lon_values[1:, :]
+            corner_lons[-1, :, 0] = lon_values[0, :]
+            corner_lons[:, 1:, 2] = lon_values[:, :-1]
+            corner_lons[:, 0, 2] = lon_values[:, 1]
+            corner_lons[:-1, 1:, 3] = lon_values[1:, :-1]
+            corner_lons[-1, 1:, 3] = lon_values[0, :-1]
+            corner_lons[:, 0, 3] = corner_lons[:, 1, 3]
+        elif subgrid == "v":
+            corner_lons[:, :-1, 0] = lon_values[:, 1:]
+            corner_lons[:, -1, 0] = lon_values[:, 0]
+            corner_lons[1:, :-1, 1] = lon_values[:-1, 1:]
+            corner_lons[1:, -1, 1] = lon_values[:-1, 0]
+            corner_lons[0, :-1, 1] = lon_values[-1, 1:]
+            corner_lons[0, -1, 1] = lon_values[-1, 0]
+            corner_lons[1:, :, 2] = lon_values[:-1, :]
+            corner_lons[0, :, 2] = lon_values[1, :]
+            corner_lons[:, :, 3] = lon_values
         return corner_lons
 
     def areas(self, subgrid):
