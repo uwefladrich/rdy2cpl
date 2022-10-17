@@ -181,8 +181,8 @@ class OrcaGrid:
 
         def mask_borders(m):
             out = m
-            out[:, -1] = 1  # mask northfold line
-            out[(0, -1), :] = 1  # mask east+west borders
+            # out[:, -1] = 1  # mask northfold line
+            # out[(0, -1), :] = 1  # mask east+west borders
             return out
 
         # If a NEMO mask file is provided, just read T, U, V masks
