@@ -9,8 +9,9 @@ def _check(subgrid):
         raise ValueError(f'Invalid ORCA subgrid: "{subgrid}"')
 
 
+#    (362, 292, 75): "ORCA1L75",
 _orca_names = {
-    (362, 292, 75): "ORCA1L75",
+    (360, 331, 75): "ORCA1L75",
 }
 
 
@@ -115,14 +116,19 @@ class OrcaGrid:
             corner_lats[:-1, 0, 3] = 2 * lat_values[1:, 1] - lat_values[1:, 2]
             corner_lats[-1, 0, 3] = 2 * lat_values[0, 1] - lat_values[0, 2]
         elif subgrid == "v":
+            # F-pivot special treatment
+            rever_lats = lat_values[::-1, -1]
             corner_lats[:, :-1, 0] = lat_values[:, 1:]
-            corner_lats[:, -1, 0] = lat_values[:, 0]
+            corner_lats[:-1, -1, 0] = rever_lats[1:]
+            corner_lats[-1, -1, 0] = rever_lats[0]
+            #
             corner_lats[1:, :-1, 1] = lat_values[:-1, 1:]
-            corner_lats[1:, -1, 1] = lat_values[:-1, 0]
             corner_lats[0, :-1, 1] = lat_values[-1, 1:]
-            corner_lats[0, -1, 1] = lat_values[-1, 0]
+            corner_lats[:, -1, 1] = rever_lats[:]
+            #
             corner_lats[1:, :, 2] = lat_values[:-1, :]
             corner_lats[0, :, 2] = lat_values[-1, :]
+            #
             corner_lats[:, :, 3] = lat_values
         return corner_lats
 
@@ -157,14 +163,19 @@ class OrcaGrid:
             corner_lons[-1, 1:, 3] = lon_values[0, :-1]
             corner_lons[:, 0, 3] = corner_lons[:, 1, 3]
         elif subgrid == "v":
+            # F-pivot special treatment
+            rever_lons = lon_values[::-1, -1]
             corner_lons[:, :-1, 0] = lon_values[:, 1:]
-            corner_lons[:, -1, 0] = lon_values[:, 0]
+            corner_lons[:-1, -1, 0] = rever_lons[1:]
+            corner_lons[-1, -1, 0] = rever_lons[0]
+            #
             corner_lons[1:, :-1, 1] = lon_values[:-1, 1:]
-            corner_lons[1:, -1, 1] = lon_values[:-1, 0]
             corner_lons[0, :-1, 1] = lon_values[-1, 1:]
-            corner_lons[0, -1, 1] = lon_values[-1, 0]
+            corner_lons[:, -1, 1] = rever_lons[:]
+            #
             corner_lons[1:, :, 2] = lon_values[:-1, :]
-            corner_lons[0, :, 2] = lon_values[1, :]
+            corner_lons[0, :, 2] = lon_values[-1, :]
+            #
             corner_lons[:, :, 3] = lon_values
         return corner_lons
 
@@ -181,8 +192,6 @@ class OrcaGrid:
 
         def mask_borders(m):
             out = m
-            # out[:, -1] = 1  # mask northfold line
-            # out[(0, -1), :] = 1  # mask east+west borders
             return out
 
         # If a NEMO mask file is provided, just read T, U, V masks
