@@ -190,34 +190,30 @@ class OrcaGrid:
     def mask(self, subgrid):
         _check(subgrid)
 
-        def mask_borders(m):
-            out = m
-            return out
-
         # If a NEMO mask file is provided, just read T, U, V masks
         if self.masks:
             with Dataset(self.masks) as nc:
                 mask = np.where(
                     nc.variables[f"{subgrid}maskutil"][0, ...].data.T > 0, 0, 1
                 )
-                return mask_borders(mask)
+                return mask
 
         # Without a NEMO mask file, compute masks from top_level in domain_cfg
         # See Section "4.3.6 level bathymetry and mask" in the NEMO book
         with Dataset(self.domain_cfg) as nc:
             tmask = np.where(nc.variables["top_level"][0, ...].data.T == 0, 1, 0)
             if subgrid == "t":
-                return mask_borders(tmask)
+                return tmask
             elif subgrid == "u":
                 umask = tmask * tmask.take(
                     range(1, tmask.shape[0] + 1), axis=0, mode="wrap"
                 )
-                return mask_borders(umask)
+                return umask
             elif subgrid == "v":
                 vmask = tmask * tmask.take(
                     range(1, tmask.shape[1] + 1), axis=1, mode="clip"
                 )
-                return mask_borders(vmask)
+                return vmask
 
 
 class OrcaTGrid(OrcaGrid):
