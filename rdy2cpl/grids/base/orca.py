@@ -9,8 +9,9 @@ def _check(subgrid):
         raise ValueError(f'Invalid ORCA subgrid: "{subgrid}"')
 
 
+#    (362, 292, 75): "ORCA1L75",
 _orca_names = {
-    (362, 292, 75): "ORCA1L75",
+    (360, 331, 75): "ORCA1L75",
 }
 
 
@@ -93,12 +94,42 @@ class OrcaGrid:
         with Dataset(self.domain_cfg) as nc:
             lat_values = nc.variables[lat_var[subgrid]][0, ...].data.T
         corner_lats = np.full((*self.shape, 4), _MISSING_VALUE)
-        if subgrid in ("t", "u"):
-            corner_lats[:, :, 0] = corner_lats[:, :, 1] = lat_values
-            corner_lats[:, 1:, 2] = corner_lats[:, 1:, 3] = lat_values[:, :-1]
+
+        if subgrid in ("t"):
+            corner_lats[:, :, 0] = lat_values
+            corner_lats[1:, :, 1] = lat_values[:-1, :]
+            corner_lats[0, :, 1] = lat_values[-1, :]
+            corner_lats[:, 1:, 3] = lat_values[:, :-1]
+            corner_lats[:, 0, 3] = 2 * lat_values[:, 1] - lat_values[:, 2]
+            corner_lats[1:, 1:, 2] = lat_values[:-1, :-1]
+            corner_lats[0, 1:, 2] = lat_values[-1, :-1]
+            corner_lats[1:, 0, 2] = 2 * lat_values[:-1, 1] - lat_values[:-1, 2]
+            corner_lats[0, 0, 2] = 2 * lat_values[-1, 1] - lat_values[-1, 2]
+        elif subgrid == "u":
+            corner_lats[:, :, 1] = lat_values
+            corner_lats[:-1, :, 0] = lat_values[1:, :]
+            corner_lats[-1, :, 0] = lat_values[0, :]
+            corner_lats[:, 1:, 2] = lat_values[:, :-1]
+            corner_lats[:, 0, 2] = 2 * lat_values[:, 1] - lat_values[:, 2]
+            corner_lats[:-1, 1:, 3] = lat_values[1:, :-1]
+            corner_lats[-1, 1:, 3] = lat_values[0, :-1]
+            corner_lats[:-1, 0, 3] = 2 * lat_values[1:, 1] - lat_values[1:, 2]
+            corner_lats[-1, 0, 3] = 2 * lat_values[0, 1] - lat_values[0, 2]
         elif subgrid == "v":
-            corner_lats[:, :-1, 0] = corner_lats[:, :-1, 1] = lat_values[:, 1:]
-            corner_lats[:, :, 2] = corner_lats[:, :, 3] = lat_values
+            # F-pivot special treatment
+            rever_lats = lat_values[::-1, -1]
+            corner_lats[:, :-1, 0] = lat_values[:, 1:]
+            corner_lats[:-1, -1, 0] = rever_lats[1:]
+            corner_lats[-1, -1, 0] = rever_lats[0]
+            #
+            corner_lats[1:, :-1, 1] = lat_values[:-1, 1:]
+            corner_lats[0, :-1, 1] = lat_values[-1, 1:]
+            corner_lats[:, -1, 1] = rever_lats[:]
+            #
+            corner_lats[1:, :, 2] = lat_values[:-1, :]
+            corner_lats[0, :, 2] = lat_values[-1, :]
+            #
+            corner_lats[:, :, 3] = lat_values
         return corner_lats
 
     def corner_longitudes(self, subgrid):
@@ -111,14 +142,41 @@ class OrcaGrid:
         with Dataset(self.domain_cfg) as nc:
             lon_values = nc.variables[lon_var[subgrid]][0, ...].data.T
         corner_lons = np.full((*self.shape, 4), _MISSING_VALUE)
-        if subgrid in ("t", "v"):
-            corner_lons[:, :, 0] = corner_lons[:, :, 3] = lon_values
-            corner_lons[:, :, 1] = corner_lons[:, :, 2] = np.roll(lon_values, 1, axis=0)
+
+        if subgrid in ("t"):
+            corner_lons[:, :, 0] = lon_values
+            corner_lons[1:, :, 1] = lon_values[:-1, :]
+            corner_lons[0, :, 1] = lon_values[-1, :]
+            corner_lons[:, 1:, 3] = lon_values[:, :-1]
+            corner_lons[:, 0, 3] = lon_values[:, 1]
+            corner_lons[1:, 1:, 2] = lon_values[:-1, :-1]
+            corner_lons[0, 1:, 2] = lon_values[-1, :-1]
+            corner_lons[1:, 0, 2] = lon_values[:-1, 1]
+            corner_lons[0, 0, 2] = lon_values[-1, 1]
         elif subgrid == "u":
-            corner_lons[:, :, 0] = corner_lons[:, :, 3] = np.roll(
-                lon_values, -1, axis=0
-            )
-            corner_lons[:, :, 1] = corner_lons[:, :, 2] = lon_values
+            corner_lons[:, :, 1] = lon_values
+            corner_lons[:-1, :, 0] = lon_values[1:, :]
+            corner_lons[-1, :, 0] = lon_values[0, :]
+            corner_lons[:, 1:, 2] = lon_values[:, :-1]
+            corner_lons[:, 0, 2] = lon_values[:, 1]
+            corner_lons[:-1, 1:, 3] = lon_values[1:, :-1]
+            corner_lons[-1, 1:, 3] = lon_values[0, :-1]
+            corner_lons[:, 0, 3] = corner_lons[:, 1, 3]
+        elif subgrid == "v":
+            # F-pivot special treatment
+            rever_lons = lon_values[::-1, -1]
+            corner_lons[:, :-1, 0] = lon_values[:, 1:]
+            corner_lons[:-1, -1, 0] = rever_lons[1:]
+            corner_lons[-1, -1, 0] = rever_lons[0]
+            #
+            corner_lons[1:, :-1, 1] = lon_values[:-1, 1:]
+            corner_lons[0, :-1, 1] = lon_values[-1, 1:]
+            corner_lons[:, -1, 1] = rever_lons[:]
+            #
+            corner_lons[1:, :, 2] = lon_values[:-1, :]
+            corner_lons[0, :, 2] = lon_values[-1, :]
+            #
+            corner_lons[:, :, 3] = lon_values
         return corner_lons
 
     def areas(self, subgrid):
@@ -132,36 +190,30 @@ class OrcaGrid:
     def mask(self, subgrid):
         _check(subgrid)
 
-        def mask_borders(m):
-            out = m
-            out[:, -1] = 1  # mask northfold line
-            out[(0, -1), :] = 1  # mask east+west borders
-            return out
-
         # If a NEMO mask file is provided, just read T, U, V masks
         if self.masks:
             with Dataset(self.masks) as nc:
                 mask = np.where(
                     nc.variables[f"{subgrid}maskutil"][0, ...].data.T > 0, 0, 1
                 )
-                return mask_borders(mask)
+                return mask
 
         # Without a NEMO mask file, compute masks from top_level in domain_cfg
         # See Section "4.3.6 level bathymetry and mask" in the NEMO book
         with Dataset(self.domain_cfg) as nc:
             tmask = np.where(nc.variables["top_level"][0, ...].data.T == 0, 1, 0)
             if subgrid == "t":
-                return mask_borders(tmask)
+                return tmask
             elif subgrid == "u":
                 umask = tmask * tmask.take(
                     range(1, tmask.shape[0] + 1), axis=0, mode="wrap"
                 )
-                return mask_borders(umask)
+                return umask
             elif subgrid == "v":
                 vmask = tmask * tmask.take(
                     range(1, tmask.shape[1] + 1), axis=1, mode="clip"
                 )
-                return mask_borders(vmask)
+                return vmask
 
 
 class OrcaTGrid(OrcaGrid):
