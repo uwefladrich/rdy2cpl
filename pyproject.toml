@@ -1,0 +1,30 @@
+[build-system]
+    requires = ["setuptools>=59.7", "wheel"]
+    build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+    packages = ["rdy2cpl"]
+
+[project]
+    name = "rdy2cpl"
+    version = "0.1.0"
+    authors = [
+        { name = "Uwe Fladrich", email = "uwe.fladrich@protonmail.com" },
+    ]
+    description = "Ready2couple (rdy2cpl), ..."
+    readme = "README.md"
+    classifiers = [
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Operating System :: OS Independent",
+    ]
+    requires-python = ">=3.7"
+    dependencies = [
+        "mpi4py",
+        "numpy",
+        "netcdf4",
+    ]
+
+    [project.urls]
+        "Homepage" = "https://github.com/uwefladrich/rdy2cpl"
+        "Bug Tracker" = "https://github.com/uwefladrich/rdy2cpl/issues"
