@@ -1,17 +1,17 @@
 # Usage:
-#   mamba env create -f conda_environment.yml
-
-name: rdy2cpl
+#   conda env create -n <name> --file conda_environment.yml
 
 channels:
   - conda-forge
   - nodefaults
 
 dependencies:
-  - python>=3.7
+  - python=3.10
   - pip
-  - mpi4py
-  - openmpi
   - numpy
   - netcdf4
   - pyaml
+  - pip:
+    # Install mpi4py from source (sdist at PyPI), this makes sure it is build
+    # against system MPI
+    - mpi4py
