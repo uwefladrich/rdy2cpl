@@ -1,0 +1,10 @@
+# Usage:
+#   conda env update -n <name> --file conda_environment_dev.yml
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - isort
+  - black

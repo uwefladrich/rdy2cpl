@@ -1,0 +1,9 @@
+# Usage:
+#   conda env update -n <name> --file conda_environment_plot.yml
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - cartopy
