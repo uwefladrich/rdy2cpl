@@ -126,9 +126,10 @@ def from_dict(thedict):
         links=[
             Link(
                 description=link.get("description", ""),
-                restart_file=link.get("restart_file", "none"),
                 dt=link["dt"],
                 lag=link.get("lag", 0),
+                mode=link.get("mode", "EXPORTED"),
+                restart_file=link.get("restart_file", "none"),
                 source=LinkEndPoint(
                     fields=link["source"]["fields"],
                     grid=Grid(**link["source"]["grid"]),
