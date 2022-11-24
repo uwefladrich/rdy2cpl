@@ -28,3 +28,6 @@
     [project.urls]
         "Homepage" = "https://github.com/uwefladrich/rdy2cpl"
         "Bug Tracker" = "https://github.com/uwefladrich/rdy2cpl/issues"
+
+    [project.scripts]
+        r2c = "rdy2cpl.cli:main"
