@@ -1,11 +1,16 @@
 .PHONY: run clean realclean distclean _catch
 
 _catch:
-	@echo "Usage: make run|clean|realclean"
+	@echo "Usage: make run|clean|realclean|distclean|ti"
 
 work_files_ece = \
 	work/ece-namcouple.yml \
 	work/domain_cfg.nc
+
+grid_files = \
+	work/grids.nc \
+	work/areas.nc \
+	work/masks.nc
 
 work:
 	@mkdir -p $@
@@ -25,3 +30,11 @@ realclean: clean
 
 distclean:
 	@rm -fr work
+
+$(grid_files):
+	$(error OASIS grid files missing! Make sure to run "make run" first)
+
+ti: $(grid_files)
+	@cd work && \
+	    ln -sf ../examples/ti-namcouple.yml && \
+	    python ../utils/ti.py ti-namcouple.yml

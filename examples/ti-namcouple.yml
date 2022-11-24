@@ -1,0 +1,25 @@
+description: Test-interpolation
+
+nlogprt: "1 0"
+
+links:
+  -
+    description: Test interpolation from source to target
+    dt: 1
+    source:
+      fields: [vsrc]
+      grid:
+        name: IOCL
+        type: P
+        overlap: 0
+    target:
+      fields: [vdst]
+      grid:
+        name: NOUM
+        type: P
+        overlap: 2
+    transformations:
+      -
+        name: SCRIPR
+        opts:
+          - GAUSWGT D SCALAR LATITUDE 1 9 2.0
