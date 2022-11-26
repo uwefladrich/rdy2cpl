@@ -1,9 +1,12 @@
 import logging
 import sys
 
-import pyoasis
 import yaml
 from mpi4py import MPI
+
+from rdy2cpl.loader import import_pyoasis
+
+pyoasis = import_pyoasis()
 
 from rdy2cpl.namcouple import from_dict, reduce
 from rdy2cpl.worker import work

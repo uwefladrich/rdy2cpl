@@ -1,8 +1,11 @@
 import sys
 
 import numpy as np
-import numpy.ma as ma
 import yaml
+
+from rdy2cpl.loader import import_pyoasis
+
+pyoasis = import_pyoasis()
 
 from rdy2cpl.grids.assign import couple_grid
 from rdy2cpl.namcouple import from_dict

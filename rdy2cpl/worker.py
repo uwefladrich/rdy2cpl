@@ -1,6 +1,8 @@
 import logging
 
-import pyoasis
+from rdy2cpl.loader import import_pyoasis
+
+pyoasis = import_pyoasis()
 
 from rdy2cpl.grids.assign import couple_grid
 
