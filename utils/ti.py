@@ -64,6 +64,10 @@ def main(cpl_info_file):
         mask=dst_grid.base.mask == 1,
     )
 
+    if np.isclose(f_err, 0.0).all():
+        print("Remapping error is globally close to zero")
+    else:
+        print("Remapping error is NOT close to zero (at least not everywhere)")
     print(f"Error min:  {np.min(f_err):10.2e}")
     print(f"Error mean: {f_err.mean():10.2e}")
     print(f"Error max:  {np.max(f_err):10.2e}")
