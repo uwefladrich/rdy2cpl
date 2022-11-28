@@ -23,6 +23,63 @@ def read_cpl_info(fname, write_namecouple=False):
     )
 
 
+def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png"):
+    try:
+        import cartopy.crs as ccrs
+        import matplotlib.cm as cm
+        import matplotlib.pyplot as plt
+    except ModuleNotFoundError as e:
+        print(
+            f"WARNING: Can not import plotting modules: {e}"
+            " No plots will be created!"
+        )
+        return
+
+    print(f"Create plots in '{figname}'")
+
+    pltargs = dict(s=0.03, cmap=cm.PiYG, transform=ccrs.PlateCarree(), vmin=0, vmax=1)
+
+    fig = plt.figure(figsize=(8, 12))
+    fig.suptitle(
+        f"OASIS3-MCT Remapping test with '{test_name}': "
+        f"{type(gsrc).__name__} --> {type(grcv).__name__}"
+    )
+
+    ax = fig.add_subplot(311, projection=ccrs.PlateCarree())
+    im = ax.scatter(
+        gsrc.center_longitudes,
+        gsrc.center_latitudes,
+        c=np.ma.array(vsnd, mask=gsrc.mask == 1),
+        **pltargs,
+    )
+    ax.coastlines()
+    fig.colorbar(im, orientation="horizontal", shrink=0.5)
+
+    ax = fig.add_subplot(312, projection=ccrs.PlateCarree())
+    im = ax.scatter(
+        grcv.center_longitudes,
+        grcv.center_latitudes,
+        c=np.ma.array(vrcv, mask=grcv.mask == 1),
+        **pltargs,
+    )
+    ax.coastlines()
+    fig.colorbar(im, orientation="horizontal", shrink=0.5)
+
+    ax = fig.add_subplot(313, projection=ccrs.PlateCarree())
+    im = ax.scatter(
+        grcv.center_longitudes,
+        grcv.center_latitudes,
+        c=verr,
+        s=0.03,
+        cmap=cm.PiYG,
+        transform=ccrs.PlateCarree(),
+    )
+    ax.coastlines()
+    fig.colorbar(im, orientation="horizontal", shrink=0.5)
+
+    plt.savefig(figname)
+
+
 def test_func_ones(lats, lons):
     return pyoasis.asarray(np.ones_like(lats))
 
@@ -71,6 +128,15 @@ def main(cpl_info_file):
     print(f"Error min:  {np.min(f_err):10.2e}")
     print(f"Error mean: {f_err.mean():10.2e}")
     print(f"Error max:  {np.max(f_err):10.2e}")
+
+    plot(
+        test_func.__name__,
+        src_grid.base,
+        dst_grid.base,
+        f_src,
+        f_rcv,
+        f_err,
+    )
 
     del oasis_component
 
