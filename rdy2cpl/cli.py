@@ -1,5 +1,5 @@
+import argparse
 import logging
-import sys
 
 import yaml
 from mpi4py import MPI
@@ -20,9 +20,55 @@ def do_nothing(rank):
     pyoasis.Component(f"noacct{rank:02}", coupled=False)
 
 
-def main():
+def parse_cmdl_args():
+    parser = argparse.ArgumentParser(
+        description="Ready2couple: A tool to set up OASIS3-MCT coupling",
+        epilog="(c) 2022 Uwe Fladrich, see LICENSE file or https://github.com/uwefladrich/rdy2cpl",
+    )
+    parser.add_argument(
+        "-l",
+        "--num-links",
+        help="print number of *distinc* coupling links",
+        action="store_true",
+    )
+    mutual_exclusive = parser.add_mutually_exclusive_group()
+    mutual_exclusive.add_argument(
+        "-n",
+        "--namcouple",
+        help="create namcouple file",
+        action="store_true",
+    )
+    mutual_exclusive.add_argument(
+        "-r",
+        "--reduced-namcouple",
+        help="create the reduced namcouple file (distinct links only)",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-g",
+        "--grids",
+        help="create OASIS grid files (grids, masks, areas)",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-w",
+        "--weights",
+        help=(
+            "create remapping weight files for all distinct links "
+            "(implies --grids)"
+        ),
+        action="store_true",
+    )
+    parser.add_argument(
+        "namcouple_spec",
+        help="YAML file with namcouple specification",
+    )
+    return parser.parse_args()
 
-    with open(sys.argv[1]) as f:
+
+def main(namcouple_spec):
+
+    with open(namcouple_spec) as f:
         namcouple = reduce(from_dict(yaml.load(f, Loader=yaml.FullLoader)))
 
     global_rank = MPI.COMM_WORLD.Get_rank()
@@ -48,5 +94,9 @@ def main():
         do_nothing(global_rank)
 
 
+def main_cli():
+    main_cli(**parse_cmdl_args())
+
+
 if __name__ == "__main__":
-    main()
+    main_cli()
