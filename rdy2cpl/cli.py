@@ -49,14 +49,14 @@ def parse_cmdl_args():
     mgroup.add_argument(
         "-n",
         "--namcouple",
-        help="create namcouple file",
+        help="only create namcouple file",
         action="store_true",
         dest="namcouple_only",
     )
     mgroup.add_argument(
         "-r",
         "--reduced-namcouple",
-        help="create the reduced namcouple file (distinct links only)",
+        help="only create the reduced namcouple file (distinct links only)",
         action="store_true",
         dest="reduced_namcouple_only",
     )
