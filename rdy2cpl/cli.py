@@ -1,15 +1,19 @@
 import argparse
 import logging
 
-import yaml
 from mpi4py import MPI
 
 from rdy2cpl.loader import import_pyoasis
 
 pyoasis = import_pyoasis()
 
-from rdy2cpl.namcouple import from_dict, reduce
 from rdy2cpl.grids.assign import couple_grid
+from rdy2cpl.namcouple import (
+    number_of_links,
+    read_namcouple_spec,
+    reduce,
+    write_namcouple,
+)
 
 _log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -40,26 +44,29 @@ def parse_cmdl_args():
         "--num-links",
         help="print number of *distinc* coupling links",
         action="store_true",
-        dest="print_num_links",
+        dest="print_number_of_links",
     )
     mgroup.add_argument(
         "-n",
         "--namcouple",
         help="create namcouple file",
         action="store_true",
+        dest="namcouple_only",
     )
     mgroup.add_argument(
         "-r",
         "--reduced-namcouple",
         help="create the reduced namcouple file (distinct links only)",
         action="store_true",
+        dest="reduced_namcouple_only",
     )
-    mgroup.add_argument(
-        "-g",
-        "--grids",
-        help="create namcouple and grid files (grids, masks, areas)",
-        action="store_true",
-    )
+    #   mgroup.add_argument(
+    #       "-g",
+    #       "--grids",
+    #       help="create namcouple and grid files (grids, masks, areas)",
+    #       action="store_true",
+    #       dest="grids_only",
+    #   )
     parser.add_argument(
         "namcouple_spec",
         help="YAML file with namcouple specification",
@@ -67,35 +74,46 @@ def parse_cmdl_args():
     return parser.parse_args()
 
 
-def main(namcouple_spec, print_num_links=False, reduced_namcouple=False):
+def main(
+    namcouple_spec,
+    *,
+    print_number_of_links,
+    namcouple_only,
+    reduced_namcouple_only,
+    #   grids_only,
+):
 
-    with open(namcouple_spec) as f:
-        namcouple = reduce(from_dict(yaml.load(f, Loader=yaml.FullLoader)))
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
 
-    num_links = len(namcouple.links)
-
-    if print_num_links:
-        print(num_links)
+    if namcouple_only:
+        if rank == 0:
+            write_namcouple(read_namcouple_spec(namcouple_spec))
         return
 
-    rank = MPI.COMM_WORLD.Get_rank()
-    size = MPI.COMM_WORLD.Get_size()
+    reduced_namcouple = reduce(read_namcouple_spec(namcouple_spec))
+    num_links = number_of_links(reduced_namcouple)
 
-    if not reduced_namcouple and num_links > size:
+    if print_number_of_links:
+        if rank == 0:
+            print(num_links)
+        return
+
+    if rank == 0:
+        write_namcouple(reduced_namcouple)
+
+    if reduced_namcouple_only:
+        return
+
+    if num_links > size:
         raise RuntimeError(
             f"Not enough MPI processes: {num_links} needed, {size} present"
         )
-
-    if rank == 0:
-        with open("namcouple", "w") as f:
-            f.write(namcouple.out)
-    MPI.COMM_WORLD.Barrier()
-
-    if reduced_namcouple:
-        return
+    comm.Barrier()
 
     if rank < num_links:
-        link = namcouple.links[rank]
+        link = reduced_namcouple.links[rank]
         _log.info(
             f"MPI process {rank} processing link "
             f"{link.source.grid.name} --> {link.target.grid.name}"
@@ -121,7 +139,7 @@ def main(namcouple_spec, print_num_links=False, reduced_namcouple=False):
 
 def main_cli():
     args = parse_cmdl_args()
-    main(args.namcouple_spec, args.print_num_links, args.reduced_namcouple)
+    main(**vars(args))
 
 
 if __name__ == "__main__":

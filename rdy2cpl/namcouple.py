@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List
 
+import yaml
+
 
 @dataclass
 class Grid:
@@ -98,7 +100,7 @@ def reduce(nmcpl):
         description=(
             f"Reduced version of '{nmcpl.description}'" if nmcpl.description else None
         ),
-        nlogprt = "0 0",
+        nlogprt="0 0",
         links=[],
     )
     unique_links = []
@@ -149,3 +151,19 @@ def from_dict(thedict):
             for link in thedict["links"]
         ],
     )
+
+
+def read_namcouple_spec(namcouple_spec_file):
+    with open(namcouple_spec_file) as f:
+        namcouple = from_dict(yaml.load(f, yaml.SafeLoader))
+    return namcouple
+
+
+def write_namcouple(namcouple, filename="namcouple"):
+    with open(filename, "w") as f:
+        f.write(namcouple.out)
+
+
+def number_of_links(namcouple):
+    "Returns the number of *distinct* links"
+    return len(reduce(namcouple).links)
