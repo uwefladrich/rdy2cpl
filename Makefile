@@ -34,6 +34,11 @@ distclean:
 $(grid_files):
 	$(error OASIS grid files missing! Make sure to run "make run" first)
 
+ti-weights: $(work_files_ece) realclean
+	@cd work && \
+	    ln -sf ../examples/ti-namcouple.yml && \
+	    ${MPIRUN4PY} -np 1 r2c ti-namcouple.yml
+
 ti: $(grid_files)
 	@cd work && \
 	    ln -sf ../examples/ti-namcouple.yml && \
