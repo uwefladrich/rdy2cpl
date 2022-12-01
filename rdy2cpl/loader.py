@@ -13,16 +13,30 @@ def import_pyoasis():
     try:
         oasis_build_path = os.environ["OASIS_BUILD_PATH"]
     except KeyError:
-        raise ImportError("OASIS_BUILD_PATH not set")
+        raise ImportError(
+            "Missing OASIS_BUILD_PATH: set this environmane variable "
+            "to point to the OASIS *build* directory!"
+        ) from None
 
     if "LD_LIBRARY_PATH" not in os.environ:
-        raise ImportError("LD_LIBRARY_PATH not set")
+        raise ImportError(
+            "Missing LD_LIBRARY_PATH: Make sure it is set and includes ${OASIS_BUILD_PATH}/lib!"
+        )
 
     if oasis_build_path + "/lib" not in os.environ["LD_LIBRARY_PATH"]:
-        raise ImportError("OASIS build path not in LD_LIBRARY_PATH")
+        raise ImportError(
+            "Incomplete LD_LIBRARY_PATH: Make sure it includes ${OASIS_BUILD_PATH}/lib!"
+        )
 
     sys.path.append(oasis_build_path + "/python")
 
-    import pyoasis
+    try:
+        import pyoasis
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            "Module 'pyoasis' not found. Maybe OASIS is not build with support for "
+            "pyOASIS or the OASIS_BUILD_PATH does not point to the correct OASIS "
+            "*build* directory?"
+        ) from None
 
     return pyoasis
