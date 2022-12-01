@@ -9,54 +9,55 @@ from rdy2cpl.loader import import_pyoasis
 pyoasis = import_pyoasis()
 
 from rdy2cpl.namcouple import from_dict, reduce
-from rdy2cpl.worker import work
+from rdy2cpl.grids.assign import couple_grid
 
 _log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def do_nothing(rank):
-    _log.warning(f"Rank {rank} not needed")
-    pyoasis.Component(f"noacct{rank:02}", coupled=False)
-
-
 def parse_cmdl_args():
     parser = argparse.ArgumentParser(
-        description="Ready2couple: A tool to set up OASIS3-MCT coupling",
-        epilog="(c) 2022 Uwe Fladrich, see LICENSE file or https://github.com/uwefladrich/rdy2cpl",
+        description=(
+            "Ready2couple: Automatic OASIS3-MCT coupling set up\n\n"
+            "The r2c command creates the OASIS namcouple file, grid description\n"
+            "files (grids.nc, masks.nc, areas.nc), and remapping weight files\n"
+            "(rmp_*.nc) for a given coupling specification, given as a YAML file."
+        ),
+        epilog=(
+            "If none of the options if given, everything is created: namcouple,\n"
+            "grid description files, and remapping weights.\n\n"
+            "IMPORTANT: r2c needs a working OASIS3-MCT installation, including\n"
+            "the pyOASIS API. Two environment variables must to be set:\n\n"
+            "  OASIS_BUILD_PATH: points to the OASIS *build* directory\n"
+            "  LD_LIBRARY_PATH: needs to include ${OASIS_BUILD_PATH}/lib\n\n"
+            "(c) 2022 Uwe Fladrich, see LICENSE file or https://github.com/uwefladrich/rdy2cpl"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
+    mgroup = parser.add_mutually_exclusive_group()
+    mgroup.add_argument(
         "-l",
         "--num-links",
         help="print number of *distinc* coupling links",
         action="store_true",
+        dest="print_num_links",
     )
-    mutual_exclusive = parser.add_mutually_exclusive_group()
-    mutual_exclusive.add_argument(
+    mgroup.add_argument(
         "-n",
         "--namcouple",
         help="create namcouple file",
         action="store_true",
     )
-    mutual_exclusive.add_argument(
+    mgroup.add_argument(
         "-r",
         "--reduced-namcouple",
         help="create the reduced namcouple file (distinct links only)",
         action="store_true",
     )
-    parser.add_argument(
+    mgroup.add_argument(
         "-g",
         "--grids",
-        help="create OASIS grid files (grids, masks, areas)",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-w",
-        "--weights",
-        help=(
-            "create remapping weight files for all distinct links "
-            "(implies --grids)"
-        ),
+        help="create namcouple and grid files (grids, masks, areas)",
         action="store_true",
     )
     parser.add_argument(
@@ -66,36 +67,61 @@ def parse_cmdl_args():
     return parser.parse_args()
 
 
-def main(namcouple_spec):
+def main(namcouple_spec, print_num_links=False, reduced_namcouple=False):
 
     with open(namcouple_spec) as f:
         namcouple = reduce(from_dict(yaml.load(f, Loader=yaml.FullLoader)))
 
-    global_rank = MPI.COMM_WORLD.Get_rank()
-    global_size = MPI.COMM_WORLD.Get_size()
+    num_links = len(namcouple.links)
 
-    i_am_worker = 0 <= global_rank < len(namcouple.links)
+    if print_num_links:
+        print(num_links)
+        return
 
-    if global_size < len(namcouple.links):
-        _log.error(
-            f"Not enough workers ({len(namcouple.links)} needed, {global_size} present)"
+    rank = MPI.COMM_WORLD.Get_rank()
+    size = MPI.COMM_WORLD.Get_size()
+
+    if not reduced_namcouple and num_links > size:
+        raise RuntimeError(
+            f"Not enough MPI processes: {num_links} needed, {size} present"
         )
-        raise RuntimeError("Not enough workers")
 
-    with open("namcouple", "w") as f:
-        f.write(namcouple.out)
-
+    if rank == 0:
+        with open("namcouple", "w") as f:
+            f.write(namcouple.out)
     MPI.COMM_WORLD.Barrier()
 
-    if i_am_worker:
-        work(global_rank, namcouple.links[global_rank])
+    if reduced_namcouple:
+        return
+
+    if rank < num_links:
+        link = namcouple.links[rank]
+        _log.info(
+            f"MPI process {rank} processing link "
+            f"{link.source.grid.name} --> {link.target.grid.name}"
+        )
+        oasis_component = pyoasis.Component(f"worker{rank:02}")
+
+        cpl_grid_source = couple_grid(link.source.grid.name)
+        cpl_grid_target = couple_grid(link.target.grid.name)
+
+        cpl_grid_source.write()
+        cpl_grid_target.write()
+
+        pyoasis.Var(f"VAR_{rank:02}_S", cpl_grid_source.partition, pyoasis.OASIS.OUT)
+        pyoasis.Var(f"VAR_{rank:02}_T", cpl_grid_target.partition, pyoasis.OASIS.IN)
+
+        oasis_component.enddef()
+        del oasis_component
 
     else:
-        do_nothing(global_rank)
+        _log.warning(f"MPI process {rank}: no link to process for me")
+        pyoasis.Component(f"noacct{rank:02}", coupled=False)
 
 
 def main_cli():
-    main_cli(**parse_cmdl_args())
+    args = parse_cmdl_args()
+    main(args.namcouple_spec, args.print_num_links, args.reduced_namcouple)
 
 
 if __name__ == "__main__":
