@@ -77,7 +77,7 @@ class ReducedGaussianGrid:
         areas = (
             2
             * np.pi
-            * EARTH_RADIUS ** 2
+            * EARTH_RADIUS**2
             * np.abs(
                 np.sin(np.radians(_latitude_bounds(self.lats, loc="n")))
                 - np.sin(np.radians(_latitude_bounds(self.lats, loc="s")))
