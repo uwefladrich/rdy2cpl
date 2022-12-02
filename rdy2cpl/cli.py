@@ -132,6 +132,10 @@ def main(
         oasis_component.enddef()
         del oasis_component
 
+        if rank == 0:
+            _log.info("Writing final namcouple file")
+            write_namcouple(read_namcouple_spec(namcouple_spec))
+
     else:
         _log.warning(f"MPI process {rank}: no link to process for me")
         pyoasis.Component(f"noacct{rank:02}", coupled=False)
