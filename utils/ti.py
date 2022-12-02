@@ -37,11 +37,11 @@ def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png")
 
     print(f"Create plots in '{figname}'")
 
-    pltargs = dict(s=0.03, cmap=cm.PiYG, transform=ccrs.PlateCarree(), vmin=0, vmax=1)
+    pltargs = dict(s=0.03, cmap=cm.turbo, transform=ccrs.PlateCarree())
 
     fig = plt.figure(figsize=(8, 12))
     fig.suptitle(
-        f"OASIS3-MCT Remapping test with '{test_name}': "
+        f"OASIS3-MCT Remapping '{test_name}': "
         f"{type(gsrc).__name__} --> {type(grcv).__name__}"
     )
 
@@ -71,7 +71,7 @@ def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png")
         grcv.center_latitudes,
         c=verr,
         s=0.03,
-        cmap=cm.PiYG,
+        cmap=cm.turbo,
         transform=ccrs.PlateCarree(),
     )
     ax.coastlines()
@@ -82,6 +82,33 @@ def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png")
 
 def test_func_ones(lats, lons):
     return pyoasis.asarray(np.ones_like(lats))
+
+
+def test_func_sinusoid(lats, lons):
+    length = 1.2 * np.pi
+    return pyoasis.asarray(
+        2.0
+        - np.cos(
+            np.pi
+            * np.arccos(np.cos(np.pi * lats / 180.0) * np.cos(np.pi * lons / 180.0))
+            / length
+        )
+    )
+
+
+def test_func_harmonic(lats, lons):
+    return pyoasis.asarray(
+        2.0
+        + np.sin(2.0 * np.pi * lats / 180.0) ** 16 * np.cos(16.0 * np.pi * lons / 180.0)
+    )
+
+
+def test_func_vortex(lats, lons):
+    raise NotImplementedError
+
+
+def test_func_gulfstream(lats, lons):
+    raise NotImplementedError
 
 
 def main(cpl_info_file):
@@ -107,7 +134,7 @@ def main(cpl_info_file):
         f"size {dst_grid.base.size} {dst_grid.base.shape}]"
     )
 
-    test_func = test_func_ones
+    test_func = test_func_sinusoid
 
     f_src = test_func(src_grid.base.center_latitudes, src_grid.base.center_longitudes)
     f_dst = test_func(dst_grid.base.center_latitudes, dst_grid.base.center_longitudes)
@@ -121,6 +148,7 @@ def main(cpl_info_file):
         mask=dst_grid.base.mask == 1,
     )
 
+    print(f"Test function: {test_func.__name__}")
     if np.isclose(f_err, 0.0).all():
         print("Remapping error is globally close to zero")
     else:
