@@ -23,6 +23,7 @@
         "mpi4py",
         "numpy",
         "netcdf4",
+        "eccodes",
     ]
 
     [project.urls]
