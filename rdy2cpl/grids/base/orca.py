@@ -9,9 +9,9 @@ def _check(subgrid):
         raise ValueError(f'Invalid ORCA subgrid: "{subgrid}"')
 
 
-#    (362, 292, 75): "ORCA1L75",
 _orca_names = {
-    (360, 331, 75): "ORCA1L75",
+    (362, 292, 75): "ORCA1L75",
+    (360, 331, 75): "eORCA1L75",
 }
 
 
@@ -63,12 +63,12 @@ class OrcaGrid:
                 if not {"tmaskutil", "umaskutil", "vmaskutil"}.issubset(nc.variables):
                     raise RuntimeError("Missing variables in NEMO masks file")
 
-    def center_latitudes(self, subgrid):
+    def read_center_latitudes(self, subgrid):
         _check(subgrid)
         with Dataset(self.domain_cfg) as nc:
             return nc.variables[f"gphi{subgrid}"][0, ...].data.T
 
-    def center_longitudes(self, subgrid):
+    def read_center_longitudes(self, subgrid):
         _check(subgrid)
         with Dataset(self.domain_cfg) as nc:
             return nc.variables[f"glam{subgrid}"][0, ...].data.T
@@ -84,7 +84,7 @@ class OrcaGrid:
     #       |  2 --------3
     #       +------------> i
 
-    def corner_latitudes(self, subgrid):
+    def read_corner_latitudes(self, subgrid):
         _check(subgrid)
         lat_var = {
             "t": "gphif",
@@ -132,7 +132,7 @@ class OrcaGrid:
             corner_lats[:, :, 3] = lat_values
         return corner_lats
 
-    def corner_longitudes(self, subgrid):
+    def read_corner_longitudes(self, subgrid):
         _check(subgrid)
         lon_var = {
             "t": "glamf",
@@ -179,7 +179,7 @@ class OrcaGrid:
             corner_lons[:, :, 3] = lon_values
         return corner_lons
 
-    def areas(self, subgrid):
+    def read_areas(self, subgrid):
         _check(subgrid)
         with Dataset(self.domain_cfg) as nc:
             return (
@@ -187,7 +187,7 @@ class OrcaGrid:
                 * nc.variables[f"e2{subgrid}"][0, ...].data.T
             )
 
-    def mask(self, subgrid):
+    def read_mask(self, subgrid):
         _check(subgrid)
 
         # If a NEMO mask file is provided, just read T, U, V masks
@@ -216,79 +216,43 @@ class OrcaGrid:
                 return vmask
 
 
-class OrcaTGrid(OrcaGrid):
-    @property
-    def center_latitudes(self):
-        return super().center_latitudes(subgrid="t")
-
-    @property
-    def center_longitudes(self):
-        return super().center_longitudes(subgrid="t")
-
-    @property
-    def corner_latitudes(self):
-        return super().corner_latitudes(subgrid="t")
-
-    @property
-    def corner_longitudes(self):
-        return super().corner_longitudes(subgrid="t")
-
-    @property
-    def areas(self):
-        return super().areas(subgrid="t")
-
-    @property
-    def mask(self):
-        return super().mask(subgrid="t")
+class OrcaTGrid:
+    def __init__(self, domain_cfg, masks=None):
+        ogrid = OrcaGrid(domain_cfg=domain_cfg, masks=masks)
+        self.name = ogrid.name
+        self.shape = ogrid.shape
+        self.size = ogrid.size
+        self.center_latitudes = ogrid.read_center_latitudes(subgrid="t")
+        self.center_longitudes = ogrid.read_center_longitudes(subgrid="t")
+        self.corner_latitudes = ogrid.read_corner_latitudes(subgrid="t")
+        self.corner_longitudes = ogrid.read_corner_longitudes(subgrid="t")
+        self.areas = ogrid.read_areas(subgrid="t")
+        self.mask = ogrid.read_mask(subgrid="t")
 
 
-class OrcaUGrid(OrcaGrid):
-    @property
-    def center_latitudes(self):
-        return super().center_latitudes(subgrid="u")
-
-    @property
-    def center_longitudes(self):
-        return super().center_longitudes(subgrid="u")
-
-    @property
-    def corner_latitudes(self):
-        return super().corner_latitudes(subgrid="u")
-
-    @property
-    def corner_longitudes(self):
-        return super().corner_longitudes(subgrid="u")
-
-    @property
-    def areas(self):
-        return super().areas(subgrid="u")
-
-    @property
-    def mask(self):
-        return super().mask(subgrid="u")
+class OrcaUGrid:
+    def __init__(self, domain_cfg, masks=None):
+        ogrid = OrcaGrid(domain_cfg=domain_cfg, masks=masks)
+        self.name = ogrid.name
+        self.shape = ogrid.shape
+        self.size = ogrid.size
+        self.center_latitudes = ogrid.read_center_latitudes(subgrid="u")
+        self.center_longitudes = ogrid.read_center_longitudes(subgrid="u")
+        self.corner_latitudes = ogrid.read_corner_latitudes(subgrid="u")
+        self.corner_longitudes = ogrid.read_corner_longitudes(subgrid="u")
+        self.areas = ogrid.read_areas(subgrid="u")
+        self.mask = ogrid.read_mask(subgrid="u")
 
 
-class OrcaVGrid(OrcaGrid):
-    @property
-    def center_latitudes(self):
-        return super().center_latitudes(subgrid="v")
-
-    @property
-    def center_longitudes(self):
-        return super().center_longitudes(subgrid="v")
-
-    @property
-    def corner_latitudes(self):
-        return super().corner_latitudes(subgrid="v")
-
-    @property
-    def corner_longitudes(self):
-        return super().corner_longitudes(subgrid="v")
-
-    @property
-    def areas(self):
-        return super().areas(subgrid="v")
-
-    @property
-    def mask(self):
-        return super().mask(subgrid="v")
+class OrcaVGrid:
+    def __init__(self, domain_cfg, masks=None):
+        ogrid = OrcaGrid(domain_cfg=domain_cfg, masks=masks)
+        self.name = ogrid.name
+        self.shape = ogrid.shape
+        self.size = ogrid.size
+        self.center_latitudes = ogrid.read_center_latitudes(subgrid="v")
+        self.center_longitudes = ogrid.read_center_longitudes(subgrid="v")
+        self.corner_latitudes = ogrid.read_corner_latitudes(subgrid="v")
+        self.corner_longitudes = ogrid.read_corner_longitudes(subgrid="v")
+        self.areas = ogrid.read_areas(subgrid="v")
+        self.mask = ogrid.read_mask(subgrid="v")
