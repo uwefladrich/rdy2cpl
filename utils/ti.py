@@ -37,45 +37,44 @@ def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png")
 
     print(f"Create plots in '{figname}'")
 
-    pltargs = dict(s=0.03, cmap=cm.turbo, transform=ccrs.PlateCarree())
-
-    fig = plt.figure(figsize=(8, 12))
-    fig.suptitle(
-        f"OASIS3-MCT Remapping '{test_name}': "
-        f"{type(gsrc).__name__} --> {type(grcv).__name__}"
+    fig, axs = plt.subplots(
+        nrows=3,
+        figsize=(6, 8),
+        layout="constrained",
+        subplot_kw={"projection": ccrs.PlateCarree()},
     )
 
-    ax = fig.add_subplot(311, projection=ccrs.PlateCarree())
-    im = ax.scatter(
+    fig.suptitle(
+        f"OASIS3-MCT Remapping '{test_name}': "
+        f"{type(gsrc).__name__} --> {type(grcv).__name__}\n"
+        f"Max error: {np.max(np.abs(verr)):10.2e}   mean error: {verr.mean():10.2e}"
+    )
+
+    common_plt_args = dict(s=0.03, cmap=cm.turbo, transform=ccrs.PlateCarree())
+
+    im = axs[0].scatter(
         gsrc.center_longitudes,
         gsrc.center_latitudes,
         c=np.ma.array(vsnd, mask=gsrc.mask == 1),
-        **pltargs,
+        **common_plt_args,
     )
-    ax.coastlines()
-    fig.colorbar(im, orientation="horizontal", shrink=0.5)
+    fig.colorbar(im)
 
-    ax = fig.add_subplot(312, projection=ccrs.PlateCarree())
-    im = ax.scatter(
+    im = axs[1].scatter(
         grcv.center_longitudes,
         grcv.center_latitudes,
         c=np.ma.array(vrcv, mask=grcv.mask == 1),
-        **pltargs,
+        **common_plt_args,
     )
-    ax.coastlines()
-    fig.colorbar(im, orientation="horizontal", shrink=0.5)
+    fig.colorbar(im)
 
-    ax = fig.add_subplot(313, projection=ccrs.PlateCarree())
-    im = ax.scatter(
+    im = axs[2].scatter(
         grcv.center_longitudes,
         grcv.center_latitudes,
         c=verr,
-        s=0.03,
-        cmap=cm.turbo,
-        transform=ccrs.PlateCarree(),
+        **common_plt_args,
     )
-    ax.coastlines()
-    fig.colorbar(im, orientation="horizontal", shrink=0.5)
+    fig.colorbar(im)
 
     plt.savefig(figname)
 
