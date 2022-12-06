@@ -17,13 +17,10 @@ def read_cpl_info(fname, write_namecouple=False):
     if write_namecouple:
         with open("namcouple", "w") as f:
             f.write(namcouple.out)
-    return (
-        namcouple.links[0].source.grid.name,
-        namcouple.links[0].target.grid.name,
-    )
+    return namcouple.links[0]
 
 
-def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png"):
+def plot(gsrc, grcv, vsnd, vrcv, verr, figtitle="OASIS3-MCT Remapping test", figname="remapping-error.png"):
     try:
         import cartopy.crs as ccrs
         import matplotlib.cm as cm
@@ -39,16 +36,11 @@ def plot(test_name, gsrc, grcv, vsnd, vrcv, verr, figname="remapping-error.png")
 
     fig, axs = plt.subplots(
         nrows=3,
-        figsize=(6, 8),
+        figsize=(6, 8.5),
         layout="constrained",
         subplot_kw={"projection": ccrs.PlateCarree()},
     )
-
-    fig.suptitle(
-        f"OASIS3-MCT Remapping '{test_name}': "
-        f"{type(gsrc).__name__} --> {type(grcv).__name__}\n"
-        f"Max error: {np.max(np.abs(verr)):10.2e}   mean error: {verr.mean():10.2e}"
-    )
+    fig.suptitle(figtitle)
 
     common_plt_args = dict(s=0.03, cmap=cm.turbo, transform=ccrs.PlateCarree())
 
@@ -112,7 +104,9 @@ def test_func_gulfstream(lats, lons):
 
 def main(cpl_info_file):
 
-    src_name, dst_name = read_cpl_info(cpl_info_file, write_namecouple=True)
+    cpl_link = read_cpl_info(cpl_info_file, write_namecouple=True)
+    src_name = cpl_link.source.grid.name
+    dst_name = cpl_link.target.grid.name
 
     oasis_component = pyoasis.Component("INTERPOLTEST")
     src_grid = couple_grid(src_name)
@@ -132,6 +126,9 @@ def main(cpl_info_file):
         f"[type {type(dst_grid.base).__name__}, "
         f"size {dst_grid.base.size} {dst_grid.base.shape}]"
     )
+    print("Remapping method:")
+    for t in cpl_link.transformations:
+        print(f"  {t.name} {t.opts}")
 
     test_func = test_func_sinusoid
 
@@ -157,12 +154,18 @@ def main(cpl_info_file):
     print(f"Error max:  {np.max(f_err):10.2e}")
 
     plot(
-        test_func.__name__,
         src_grid.base,
         dst_grid.base,
         f_src,
         f_rcv,
         f_err,
+        figtitle=(
+            f"Remapping '{test_func.__name__}': "
+            f"{type(src_grid.base).__name__} ({src_name}) -> "
+            f"{type(dst_grid.base).__name__} ({dst_name})\n"
+            + "\n".join([t.name+' '+t.opts[0] for t in cpl_link.transformations])
+            + f"\nMax error: {np.max(np.abs(f_err)):8.2e}, mean: {f_err.mean():8.2e}"
+        ),
     )
 
     del oasis_component
