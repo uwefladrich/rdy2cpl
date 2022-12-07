@@ -40,3 +40,6 @@ def import_pyoasis():
         ) from None
 
     return pyoasis
+
+
+pyoasis = import_pyoasis()

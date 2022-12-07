@@ -3,10 +3,7 @@ import logging
 
 from mpi4py import MPI
 
-from rdy2cpl.loader import import_pyoasis
-
-pyoasis = import_pyoasis()
-
+from rdy2cpl.loader import pyoasis
 from rdy2cpl.model_spec.ecearth import couple_grid
 from rdy2cpl.namcouple import (
     number_of_links,
