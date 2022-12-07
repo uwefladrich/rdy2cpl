@@ -111,6 +111,10 @@ def test_func_gulfstream(lats, lons):
     raise NotImplementedError
 
 
+def test_func_ice_edge(lats, lons):
+    return pyoasis.asarray(np.where(lats > 70, 1, 0))
+
+
 def main(cpl_info_file):
 
     cpl_link = read_cpl_info(cpl_info_file, write_namecouple=True)
