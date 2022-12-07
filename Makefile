@@ -20,7 +20,7 @@ $(work_files_ece): work
 
 run: $(work_files_ece) realclean
 	@cd work && \
-	    ${MPIRUN4PY} -np 8 r2c ece-namcouple.yml
+	    mpirun -np 8 r2c ece-namcouple.yml
 
 clean:
 	@rm -f work/debug.*.* work/nout.0*
@@ -37,7 +37,7 @@ $(grid_files):
 ti-weights: $(work_files_ece) realclean
 	@cd work && \
 	    ln -sf ../examples/ti-namcouple.yml && \
-	    ${MPIRUN4PY} -np 1 r2c ti-namcouple.yml
+	    mpirun -np 1 r2c ti-namcouple.yml
 
 ti: $(grid_files)
 	@cd work && \
