@@ -6,6 +6,7 @@ import numpy as np
 from rdy2cpl.grib import read as grib_read
 from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
 from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
+from rdy2cpl.grids.base.tl import Tl159
 from rdy2cpl.grids.base.tco import Tco95, Tco159, Tco319
 from rdy2cpl.grids.couple import CoupleGrid
 
@@ -76,6 +77,12 @@ _base_grid_factory = namedtuple(
 _ece_grids = {
     "IOCL": _base_grid_factory(
         Tco95,
+        (),
+        {},
+        ((oifs_read_mask, ("icmgginit",)),),
+    ),
+    "IOLL": _base_grid_factory(
+        Tl159,
         (),
         {},
         ((oifs_read_mask, ("icmgginit",)),),
