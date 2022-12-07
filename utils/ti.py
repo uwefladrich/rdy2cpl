@@ -17,7 +17,15 @@ def read_cpl_info(fname, write_namecouple=False):
     return namcouple.links[0]
 
 
-def plot(gsrc, grcv, vsnd, vrcv, verr, figtitle="OASIS3-MCT Remapping test", figname="remapping-error.png"):
+def plot(
+    gsrc,
+    grcv,
+    vsnd,
+    vrcv,
+    verr,
+    figtitle="OASIS3-MCT Remapping test",
+    figname="remapping-error.png",
+):
     try:
         import cartopy.crs as ccrs
         import matplotlib.cm as cm
@@ -160,7 +168,7 @@ def main(cpl_info_file):
             f"Remapping '{test_func.__name__}': "
             f"{type(src_grid.base).__name__} ({src_name}) -> "
             f"{type(dst_grid.base).__name__} ({dst_name})\n"
-            + "\n".join([t.name+' '+t.opts[0] for t in cpl_link.transformations])
+            + "\n".join([t.name + " " + t.opts[0] for t in cpl_link.transformations])
             + f"\nMax error: {np.max(np.abs(f_err)):8.2e}, mean: {f_err.mean():8.2e}"
         ),
     )
