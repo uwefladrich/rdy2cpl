@@ -62,6 +62,52 @@ Note that the OASIS installation process for pyOASIS suggests setting further
 environment variables. These variables are not needed for `rdy2cpl`.
 
 
+## Running the `r2c` tool
+
+The main Ready2couple command line tool is `r2c`, which should be in the `PATH`
+once the installation is completed as described above:
+```
+> r2c --help
+usage: r2c [-h] [-l | -n | -r] namcouple_spec
+
+Ready2couple: Automatic OASIS3-MCT coupling set up
+
+The r2c command creates the OASIS namcouple file, grid description
+files (grids.nc, masks.nc, areas.nc), and remapping weight files
+(rmp_*.nc) for a given coupling specification, given as a YAML file.
+
+positional arguments:
+  namcouple_spec        YAML file with namcouple specification
+
+options:
+  -h, --help            show this help message and exit
+  -l, --num-links       print number of *distinc* coupling links
+  -n, --namcouple       only create namcouple file
+  -r, --reduced-namcouple
+                        only create the reduced namcouple file (distinct links only)
+
+If none of the options if given, everything is created: namcouple,
+grid description files, and remapping weights.
+
+IMPORTANT: r2c needs a working OASIS3-MCT installation, including
+the pyOASIS API. Two environment variables must to be set:
+
+  OASIS_BUILD_PATH: points to the OASIS *build* directory
+  LD_LIBRARY_PATH: needs to include ${OASIS_BUILD_PATH}/lib
+```
+
+For convenience, a `Makefile` is provided that will take care of copying
+necessary files to a `work` subdirectory and starting `r2c` with the appropriate
+number of processes via `mpirun`. The example run can be started with `make
+run`. However, keep in mind that coupling configuration is quite specific to the
+use case and that some adjustments might be needed. Do not expect the `Makefile`
+to work robustly without changes in all user environments.
+
+Examples for namcouple specification files are provided in the `examples/`
+subdirectory. Please refer to these examples for the YAML form of the coupling
+information that is needed for `r2c`.
+
+
 ## Possible issues
 
 ### MPI for Python (`mpi4py`)
