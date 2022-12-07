@@ -8,10 +8,12 @@ remapping weights for the OASIS coupler.
 
 ### Prerequisites
 
+* C and Fortran compilers
+* MPI installation, libraries and headers
+* NetCDF libraries, headers and Fortran modules
 * Python>=3.7
-* OASIS3-MCT>=5.0 (build with shared libraries and pyOASIS support)
-* Python modules as required in `condaenv*.yml` files
-* working compilers and MPI installation
+* OASIS3-MCT>=5.0 (build with shared libraries and pyOASIS support, see below)
+* Python modules as required in `condaenv*.yml` files (will be installed with conda)
 
 
 ### Install OASIS3-MCT
@@ -54,7 +56,7 @@ plotting dependencies:
 Make sure that `rdy2cpl` finds your OASIS installation by setting/modifying the following two environment variables:
 
 * `OASIS_BUILD_PATH` must point to the OASIS **build** directory
-* the `LD_LIBRARY_PATH` variable must include `OASIS_BUILD_DIRECTORY/lib`
+* the `LD_LIBRARY_PATH` variable must include `$OASIS_BUILD_DIRECTORY/lib`
 
 Note that the OASIS installation process for pyOASIS suggests setting further
 environment variables. These variables are not needed for `rdy2cpl`.
