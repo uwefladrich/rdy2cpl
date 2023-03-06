@@ -2,7 +2,7 @@ import os
 import sys
 
 
-def import_pyoasis():
+def _import_pyoasis():
     """Imports and returns the pyoasis module, which is usually not available
     for a simple Python import command.
     Relies on environment variables:
@@ -42,4 +42,34 @@ def import_pyoasis():
     return pyoasis
 
 
-pyoasis = import_pyoasis()
+pyoasis = _import_pyoasis()
+
+
+class _noStdout:
+    """A context manager that swallows stdout"""
+
+    def __enter__(self):
+        self.stdout = sys.stdout
+        sys.stdout = self
+
+    def __exit__(self, type, value, traceback):
+        sys.stdout = self.stdout
+        if type is not None:
+            raise
+
+    def write(self, x):
+        pass
+
+    def flush(self):
+        pass
+
+
+def _import_eccodes():
+    """Prevent eccodes from writing directly to stdout during import"""
+    with _noStdout():
+        import eccodes
+
+    return eccodes
+
+
+eccodes = _import_eccodes()

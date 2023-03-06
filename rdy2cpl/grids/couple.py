@@ -1,6 +1,6 @@
-from rdy2cpl.loader import import_pyoasis
+from rdy2cpl.loader import _import_pyoasis
 
-pyoasis = import_pyoasis()
+pyoasis = _import_pyoasis()
 
 
 class CoupleGrid:

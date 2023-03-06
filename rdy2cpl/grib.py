@@ -1,6 +1,6 @@
 """GRIB file handling with ecCodes """
 
-import eccodes as ecc
+from rdy2cpl.loader import eccodes as ecc
 
 
 def read(file, shortnames):
