@@ -5,12 +5,8 @@ from mpi4py import MPI
 
 from rdy2cpl.loader import pyoasis
 from rdy2cpl.model_spec.ecearth import couple_grid
-from rdy2cpl.namcouple import (
-    number_of_links,
-    read_namcouple_spec,
-    reduce,
-    write_namcouple,
-)
+from rdy2cpl.namcouple import number_of_links, reduce, write_namcouple
+from rdy2cpl.namcouple_spec import read as read_namcouple_spec
 
 _log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -79,7 +75,6 @@ def main(
     reduced_namcouple_only,
     #   grids_only,
 ):
-
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()

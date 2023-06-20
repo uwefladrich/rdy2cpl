@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List
 
-import yaml
-
 
 @dataclass
 class Grid:
@@ -151,12 +149,6 @@ def from_dict(thedict):
             for link in thedict["links"]
         ],
     )
-
-
-def read_namcouple_spec(namcouple_spec_file):
-    with open(namcouple_spec_file) as f:
-        namcouple = from_dict(yaml.load(f, yaml.SafeLoader))
-    return namcouple
 
 
 def write_namcouple(namcouple, filename="namcouple"):
