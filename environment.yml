@@ -1,5 +1,7 @@
 # Usage:
-#   conda env create -n <name> --file conda_environment.yml
+#   conda env create --name <name> --file environment.yml
+# or:
+#   conda env create --prefix <path> --file environment.yml
 
 channels:
   - conda-forge

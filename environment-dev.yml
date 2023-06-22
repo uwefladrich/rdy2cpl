@@ -1,5 +1,7 @@
 # Usage:
-#   conda env update -n <name> --file conda_environment_dev.yml
+#   conda env update --name <name> --file environment-dev.yml
+# or:
+#   conda env update --prefix <path> --file environment-dev.yml
 
 channels:
   - conda-forge

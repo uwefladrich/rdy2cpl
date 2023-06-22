@@ -1,5 +1,7 @@
 # Usage:
-#   conda env update -n <name> --file conda_environment_plot.yml
+#   conda env update --name <name> --file environment-plot.yml
+# or:
+#   conda env update --prefix <path> --file environment-plot.yml
 
 channels:
   - conda-forge
