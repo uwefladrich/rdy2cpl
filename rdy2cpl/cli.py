@@ -61,14 +61,14 @@ def parse_cmdl_args():
     #       dest="grids_only",
     #   )
     parser.add_argument(
-        "namcouple_spec",
+        "spec_file",
         help="YAML file with namcouple specification",
     )
     return parser.parse_args()
 
 
 def main(
-    namcouple_spec,
+    spec_file,
     *,
     print_number_of_links,
     namcouple_only,
@@ -81,10 +81,10 @@ def main(
 
     if namcouple_only:
         if rank == 0:
-            write_namcouple(read_namcouple_spec(namcouple_spec))
+            write_namcouple(read_namcouple_spec(spec_file))
         return
 
-    reduced_namcouple = reduce(read_namcouple_spec(namcouple_spec))
+    reduced_namcouple = reduce(read_namcouple_spec(spec_file))
     num_links = number_of_links(reduced_namcouple)
 
     if print_number_of_links:
@@ -126,7 +126,7 @@ def main(
 
         if rank == 0:
             _log.info("Writing final namcouple file")
-            write_namcouple(read_namcouple_spec(namcouple_spec))
+            write_namcouple(read_namcouple_spec(spec_file))
 
     else:
         _log.warning(f"MPI process {rank}: no link to process for me")
