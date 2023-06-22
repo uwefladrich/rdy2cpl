@@ -106,3 +106,7 @@ class Namcouple:
         links = "\n".join([str(link) for link in self.links])
         footer = "\n$END\n"
         return title + header + links + footer
+
+    def save(self, name="namcouple"):
+        with open(name, "w") as f:
+            f.write(str(self))
