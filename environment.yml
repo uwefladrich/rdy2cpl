@@ -1,16 +1,19 @@
 # Usage:
-#   conda env create -n <name> --file conda_environment.yml
+#   conda env create --name <name> --file environment.yml
+# or:
+#   conda env create --prefix <path> --file environment.yml
 
 channels:
   - conda-forge
   - nodefaults
 
 dependencies:
-  - python=3.10
+  - python>=3.10
   - pip
   - numpy
   - netcdf4
   - pyaml
+  - jinja2
   # The conda eccodes package delivers the binary library
   - eccodes
   - pip:

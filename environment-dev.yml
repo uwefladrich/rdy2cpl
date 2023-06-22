@@ -1,0 +1,12 @@
+# Usage:
+#   conda env update --name <name> --file environment-dev.yml
+# or:
+#   conda env update --prefix <path> --file environment-dev.yml
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - isort
+  - black
