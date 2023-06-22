@@ -5,8 +5,7 @@ from mpi4py import MPI
 
 from rdy2cpl.loader import pyoasis
 from rdy2cpl.model_spec.ecearth import couple_grid
-from rdy2cpl.namcouple import number_of_links, reduce, write_namcouple
-from rdy2cpl.namcouple_spec import read as read_namcouple_spec
+from rdy2cpl.namcouple.factory import from_yaml
 
 _log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -79,32 +78,48 @@ def main(
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    try:
+        with open(spec_file) as f:
+            namcouple_spec = f.read()
+    except OSError as e:
+        _log.error(f"Could not open/read namcouple spec file: {e}")
+        return
+    namcouple = from_yaml(namcouple_spec)
+
     if namcouple_only:
         if rank == 0:
-            write_namcouple(read_namcouple_spec(spec_file))
+            _log.info("Writing namcouple file")
+            try:
+                namcouple.save()
+            except OSError as e:
+                _log.error(f"Could not write namcouple file: {e}")
         return
 
-    reduced_namcouple = reduce(read_namcouple_spec(spec_file))
-    num_links = number_of_links(reduced_namcouple)
+    reduced_namcouple = namcouple.reduced()
 
     if print_number_of_links:
         if rank == 0:
-            print(num_links)
+            print(reduced_namcouple.num_links)
         return
 
     if rank == 0:
-        write_namcouple(reduced_namcouple)
+        try:
+            _log.info("Writing reduced namcouple file")
+            namcouple.reduced().save()
+        except OSError as e:
+            _log.error(f"Could not write reduced namcouple file: {e}")
+            return
 
     if reduced_namcouple_only:
         return
 
-    if num_links > size:
+    if reduced_namcouple.num_links > size:
         raise RuntimeError(
-            f"Not enough MPI processes: {num_links} needed, {size} present"
+            f"Not enough MPI processes: {reduced_namcouple.num_links} needed, {size} present"
         )
     comm.Barrier()
 
-    if rank < num_links:
+    if rank < reduced_namcouple.num_links:
         link = reduced_namcouple.links[rank]
         _log.info(
             f"MPI process {rank} processing link "
@@ -126,7 +141,7 @@ def main(
 
         if rank == 0:
             _log.info("Writing final namcouple file")
-            write_namcouple(read_namcouple_spec(spec_file))
+            namcouple.save()
 
     else:
         _log.warning(f"MPI process {rank}: no link to process for me")
