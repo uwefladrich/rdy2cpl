@@ -93,7 +93,7 @@ _ece_grids = {
     "ILCM": _base_grid_factory(Tco159),
     "IOCH": _base_grid_factory(Tco319),
     "ILCH": _base_grid_factory(Tco319),
-    "RNFA": _base_grid_factory(EquidistantLatLonGrid, (360, 180)),
+    "RNFA": _base_grid_factory(EquidistantLatLonGrid, (512, 256)),
     "NOUM": _base_grid_factory(
         OrcaUGrid,
         ("domain_cfg.nc",),
