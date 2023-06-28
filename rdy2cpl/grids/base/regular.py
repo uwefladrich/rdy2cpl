@@ -43,36 +43,38 @@ class RegularLatLonGrid:
 
     @property
     def center_latitudes(self):
-        return self.t(np.tile(self.lats, (self.nlons, 1)))
+        return self.t(np.tile(self.lats, (self.nlons, 1)).T)
 
     @property
     def center_longitudes(self):
-        return self.t(np.tile(self.lons, (self.nlats, 1)).T)
+        return self.t(np.tile(self.lons, (self.nlats, 1)))
 
     @property
     def corner_latitudes(self):
         n_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="u")
         s_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="l")
-        return np.array(
+        return np.transpose(
             [
-                self.t(np.tile(n_lats, (self.nlons, 1))),  # 1 ---- 0
-                self.t(np.tile(n_lats, (self.nlons, 1))),  # |      |
-                self.t(np.tile(s_lats, (self.nlons, 1))),  # |      |
-                self.t(np.tile(s_lats, (self.nlons, 1))),  # 2 ---- 3
-            ]
+                self.t(np.tile(n_lats, (self.nlons, 1)).T),  # 1 ---- 0
+                self.t(np.tile(n_lats, (self.nlons, 1)).T),  # |      |
+                self.t(np.tile(s_lats, (self.nlons, 1)).T),  # |      |
+                self.t(np.tile(s_lats, (self.nlons, 1)).T),  # 2 ---- 3
+            ],
+            (1, 2, 0),
         )
 
     @property
     def corner_longitudes(self):
         e_lons = interval_bounds(0, self.lons, 360, loc="r", wrap=True)
         w_lons = interval_bounds(0, self.lons, 360, loc="l")
-        return np.array(
+        return np.transpose(
             [
-                self.t(np.tile(e_lons, (self.nlats, 1)).T),  # 1 ---- 0
-                self.t(np.tile(w_lons, (self.nlats, 1)).T),  # |      |
-                self.t(np.tile(w_lons, (self.nlats, 1)).T),  # |      |
-                self.t(np.tile(e_lons, (self.nlats, 1)).T),  # 2 ---- 3
-            ]
+                self.t(np.tile(e_lons, (self.nlats, 1))),  # 1 ---- 0
+                self.t(np.tile(w_lons, (self.nlats, 1))),  # |      |
+                self.t(np.tile(w_lons, (self.nlats, 1))),  # |      |
+                self.t(np.tile(e_lons, (self.nlats, 1))),  # 2 ---- 3
+            ],
+            (1, 2, 0),
         )
 
     @property
@@ -87,7 +89,7 @@ class RegularLatLonGrid:
                 * np.abs(np.sin(np.radians(n_lats)) - np.sin(np.radians(s_lats)))
                 / self.nlons,
                 (self.nlons, 1),
-            )
+            ).T
         )
 
     @property

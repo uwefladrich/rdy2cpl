@@ -5,9 +5,9 @@ import numpy as np
 
 from rdy2cpl.grib import read as grib_read
 from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
-from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
-from rdy2cpl.grids.base.tl import Tl159
+from rdy2cpl.grids.base.regular_gaussian import N128
 from rdy2cpl.grids.base.tco import Tco95, Tco159, Tco319
+from rdy2cpl.grids.base.tl import Tl159
 from rdy2cpl.grids.couple import CoupleGrid
 
 _log = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ _ece_grids = {
     "ILCM": _base_grid_factory(Tco159),
     "IOCH": _base_grid_factory(Tco319),
     "ILCH": _base_grid_factory(Tco319),
-    "RNFA": _base_grid_factory(EquidistantLatLonGrid, (512, 256)),
+    "RNFA": _base_grid_factory(N128, type_kwargs={"transposed": True}),
     "NOUM": _base_grid_factory(
         OrcaUGrid,
         ("domain_cfg.nc",),
