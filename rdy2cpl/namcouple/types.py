@@ -90,14 +90,18 @@ class Namcouple:
             links=[],
         )
         unique_links = []
-        for idx, lnk in enumerate(self.links):
+        for lnk in self.links:
             if lnk not in unique_links:
                 unique_links.append(lnk)
                 rn.links.append(
                     Link(
                         dt=1,
-                        source=LinkEndPoint([f"VAR_{idx:02}_S"], lnk.source.grid),
-                        target=LinkEndPoint([f"VAR_{idx:02}_T"], lnk.target.grid),
+                        source=LinkEndPoint(
+                            [f"VAR_{len(unique_links)-1:02}_S"], lnk.source.grid
+                        ),
+                        target=LinkEndPoint(
+                            [f"VAR_{len(unique_links)-1:02}_T"], lnk.target.grid
+                        ),
                         transformations=lnk.transformations,
                     )
                 )
