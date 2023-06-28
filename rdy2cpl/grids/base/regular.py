@@ -10,15 +10,16 @@ def _is_monotonic(array):
 
 
 class RegularLatLonGrid:
-    def __init__(self, lats, lons, *, first_lat=-90):
-        if not _is_monotonic((first_lat, *lats, -first_lat)):
+    def __init__(self, lats, lons, start_lat=-90, transposed=False) -> None:
+        if not _is_monotonic((start_lat, *lats, -start_lat)):
             raise ValueError("Non-monotonic latitude values")
         if not _is_monotonic(lons):
             raise ValueError("Non-monotonic longitude values")
-        self.first_lat = first_lat
         self.lats = np.array(lats)
         self.lons = np.array(lons)
-        self.mask = np.zeros(self.shape)
+        self.start_lat = start_lat
+        self.transposed = transposed
+        self.t = np.transpose if transposed else lambda x: x
 
     @property
     def nlats(self):
@@ -30,7 +31,11 @@ class RegularLatLonGrid:
 
     @property
     def shape(self):
-        return (self.nlats, self.nlons)
+        return (
+            (self.nlats, self.nlons)
+            if not self.transposed
+            else (self.nlons, self.nlats)
+        )
 
     @property
     def size(self):
@@ -38,22 +43,22 @@ class RegularLatLonGrid:
 
     @property
     def center_latitudes(self):
-        return np.tile(self.lats, (self.nlons, 1)).T
+        return self.t(np.tile(self.lats, (self.nlons, 1)))
 
     @property
     def center_longitudes(self):
-        return np.tile(self.lons, (self.nlats, 1))
+        return self.t(np.tile(self.lons, (self.nlats, 1)).T)
 
     @property
     def corner_latitudes(self):
-        n_lats = interval_bounds(self.first_lat, self.lats, -self.first_lat, loc="u")
-        s_lats = interval_bounds(self.first_lat, self.lats, -self.first_lat, loc="l")
-        return np.transpose(
+        n_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="u")
+        s_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="l")
+        return np.array(
             [
-                np.tile(n_lats, (self.nlons, 1)),  #  1 ---- 0
-                np.tile(n_lats, (self.nlons, 1)),  #  |      |
-                np.tile(s_lats, (self.nlons, 1)),  #  |      |
-                np.tile(s_lats, (self.nlons, 1)),  #  2 ---- 3
+                self.t(np.tile(n_lats, (self.nlons, 1))),  # 1 ---- 0
+                self.t(np.tile(n_lats, (self.nlons, 1))),  # |      |
+                self.t(np.tile(s_lats, (self.nlons, 1))),  # |      |
+                self.t(np.tile(s_lats, (self.nlons, 1))),  # 2 ---- 3
             ]
         )
 
@@ -61,33 +66,40 @@ class RegularLatLonGrid:
     def corner_longitudes(self):
         e_lons = interval_bounds(0, self.lons, 360, loc="r", wrap=True)
         w_lons = interval_bounds(0, self.lons, 360, loc="l")
-        return np.transpose(
+        return np.array(
             [
-                np.tile(e_lons, (self.nlats, 1)).T,  #  1 ---- 0
-                np.tile(w_lons, (self.nlats, 1)).T,  #  |      |
-                np.tile(w_lons, (self.nlats, 1)).T,  #  |      |
-                np.tile(e_lons, (self.nlats, 1)).T,  #  2 ---- 3
+                self.t(np.tile(e_lons, (self.nlats, 1)).T),  # 1 ---- 0
+                self.t(np.tile(w_lons, (self.nlats, 1)).T),  # |      |
+                self.t(np.tile(w_lons, (self.nlats, 1)).T),  # |      |
+                self.t(np.tile(e_lons, (self.nlats, 1)).T),  # 2 ---- 3
             ]
         )
 
     @property
     def areas(self):
-        n_lats = interval_bounds(self.first_lat, self.lats, -self.first_lat, loc="u")
-        s_lats = interval_bounds(self.first_lat, self.lats, -self.first_lat, loc="l")
-        return np.tile(
-            2
-            * np.pi
-            * EARTH_RADIUS ** 2
-            * np.abs(np.sin(np.radians(n_lats)) - np.sin(np.radians(s_lats)))
-            / self.nlons,
-            (self.nlons, 1),
-        ).T
+        n_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="u")
+        s_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="l")
+        return self.t(
+            np.tile(
+                2
+                * np.pi
+                * EARTH_RADIUS**2
+                * np.abs(np.sin(np.radians(n_lats)) - np.sin(np.radians(s_lats)))
+                / self.nlons,
+                (self.nlons, 1),
+            )
+        )
+
+    @property
+    def mask(self):
+        return np.zeros(self.shape)
 
 
 class EquidistantLatLonGrid(RegularLatLonGrid):
-    def __init__(self, nlats, nlons, *, first_lat=-90):
+    def __init__(self, nlats, nlons, *, start_lat=-90, transposed=False):
         super().__init__(
-            equidistant(first_lat, -first_lat, nlats),
+            equidistant(start_lat, -start_lat, nlats),
             equidistant(0, 360, nlons, center_at_start=True),
-            first_lat=first_lat,
+            start_lat=start_lat,
+            transposed=transposed,
         )
