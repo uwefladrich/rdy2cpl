@@ -3,8 +3,13 @@ from .utils import equidistant
 
 
 class N128(RegularLatLonGrid):
-    def __init__(self):
-        super().__init__(_lats_n128, equidistant(0, 360, 512, center_at_start=True))
+    def __init__(self, transposed=False):
+        super().__init__(
+            _lats_n128,
+            equidistant(0, 360, 512, center_at_start=True),
+            start_lat=-90,
+            transposed=transposed,
+        )
 
 
 _lats_n128 = [
