@@ -25,12 +25,26 @@ class LinkEndPoint:
 class Link:
     source: LinkEndPoint
     target: LinkEndPoint
-    dt: int = field(compare=False)
-    description: str = field(default=None, compare=False)
+    dt: int
+    description: str = field(default=None)
     transformations: List[Transformation] = field(default_factory=list)
-    lag: int = field(default=0, compare=False)
-    mode: str = field(default="EXPORTED", compare=False)
-    restart_file: str = field(default="none", compare=False)
+    lag: int = field(default=0)
+    mode: str = field(default="EXPORTED")
+    restart_file: str = field(default="none")
+
+    def __eq__(self, other):
+        """Two Links are considered equal if they would result in the same OASIS
+        remapping weight file (rmp_*.nc). This is the case if, and only if, they
+        have the same source and target and use the same SCRIP remapping method
+        with the same parameters."""
+        return (
+            (self.source == other.source)
+            and (self.target == other.target)
+            and (
+                [t for t in self.transformations if t.name is "SCRIPR"]
+                == [t for t in other.transformations if t.name is "SCRIPR"]
+            )
+        )
 
     def __str__(self):
         header = f"# {self.description}\n" if self.description else ""
@@ -76,14 +90,18 @@ class Namcouple:
             links=[],
         )
         unique_links = []
-        for idx, lnk in enumerate(self.links):
+        for lnk in self.links:
             if lnk not in unique_links:
                 unique_links.append(lnk)
                 rn.links.append(
                     Link(
                         dt=1,
-                        source=LinkEndPoint([f"VAR_{idx:02}_S"], lnk.source.grid),
-                        target=LinkEndPoint([f"VAR_{idx:02}_T"], lnk.target.grid),
+                        source=LinkEndPoint(
+                            [f"VAR_{len(unique_links)-1:02}_S"], lnk.source.grid
+                        ),
+                        target=LinkEndPoint(
+                            [f"VAR_{len(unique_links)-1:02}_T"], lnk.target.grid
+                        ),
                         transformations=lnk.transformations,
                     )
                 )
