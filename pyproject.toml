@@ -31,3 +31,6 @@
 
     [project.scripts]
         r2c = "rdy2cpl.cli:main_cli"
+
+    [project.entry-points."scriptengine.tasks"]
+        "rdy2cpl.r2c" = "rdy2cpl.scriptengine_task:R2C"
