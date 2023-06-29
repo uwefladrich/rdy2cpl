@@ -16,6 +16,7 @@ dependencies:
   - jinja2
   # The conda eccodes package delivers the binary library
   - eccodes
+  - scriptengine
   - pip:
     # Install mpi4py from source (sdist at PyPI), this makes sure it is build
     # against system MPI
