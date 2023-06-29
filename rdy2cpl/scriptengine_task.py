@@ -17,11 +17,11 @@ except (ModuleNotFoundError, ImportError) as e:
     )
 else:
 
-    class R2C(Task):
+    class MakeAll(Task):
         _required_arguments = ("namcouple",)
 
         def __init__(self, arguments):
-            R2C.check_arguments(arguments)
+            MakeAll.check_arguments(arguments)
             super().__init__(arguments)
 
         @timed_runner
