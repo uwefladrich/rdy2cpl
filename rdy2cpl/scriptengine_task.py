@@ -52,21 +52,31 @@ else:
             nweights = namcouple.reduced().num_links
 
             self.log_debug(f"Running r2c using {tmp_namcouple_file}")
-            subprocess.run(
-                [
-                    "srun",
-                    "--nodes",
-                    str(nweights),
-                    "--ntasks",
-                    str(nweights),
-                    "--ntasks-per-node",
-                    "1",
-                    "r2c",
+            cmd = [
+                "srun",
+                "--nodes",
+                nweights,
+                "--ntasks",
+                nweights,
+                "--ntasks-per-node",
+                1,
+                "r2c",
+                tmp_namcouple_file,
+            ]
+            try:
+                subprocess.run(map(str, cmd), capture_output=True, check=True)
+            except subprocess.CalledProcessError as e:
+                self.log_error(
+                    f"Failed running r2c: return code is '{e.returncode}'"
+                    f" and error message '{e.stderr}'"
+                )
+            else:
+                for p in (
                     tmp_namcouple_file,
-                ]
-            )
-
-            tmp_namcouple_file.unlink()
+                    *Path(".").glob("debug.*.??"),
+                    *Path(".").glob("nout.??????"),
+                ):
+                    p.unlink()
 
     class MakeNamcouple(Task):
         _required_arguments = ("namcouple",)
