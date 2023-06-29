@@ -50,8 +50,8 @@ class Link:
             (self.source == other.source)
             and (self.target == other.target)
             and (
-                [t for t in self.transformations if t.name is "SCRIPR"]
-                == [t for t in other.transformations if t.name is "SCRIPR"]
+                [t for t in self.transformations if t.name == "SCRIPR"]
+                == [t for t in other.transformations if t.name == "SCRIPR"]
             )
         )
 
