@@ -67,3 +67,29 @@ else:
             )
 
             tmp_namcouple_file.unlink()
+
+    class MakeNamcouple(Task):
+        _required_arguments = ("namcouple",)
+
+        def __init__(self, arguments):
+            MakeAll.check_arguments(arguments)
+            super().__init__(arguments)
+
+        @timed_runner
+        def run(self, context):
+            namcouple_file = Path(self.getarg("namcouple", context))
+            self.log_info(f"Open namcouple spec file: {namcouple_file}")
+            try:
+                with open(namcouple_file) as f:
+                    namcouple_spec = f.read()
+            except OSError as e:
+                self.log_error(f"Could not open/read namcouple spec file: {e}")
+                raise ScriptEngineTaskRunError
+            namcouple = from_yaml(namcouple_spec, context)
+
+            self.log_debug("Writing new namcouple file")
+            try:
+                namcouple.save()
+            except OSError as e:
+                self.log_error(f"Could not open/write the namcouple file: {e}")
+                raise ScriptEngineTaskRunError

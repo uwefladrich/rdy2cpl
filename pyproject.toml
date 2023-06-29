@@ -34,3 +34,4 @@
 
     [project.entry-points."scriptengine.tasks"]
         "rdy2cpl.make_all" = "rdy2cpl.scriptengine_task:MakeAll"
+        "rdy2cpl.make_namcouple" = "rdy2cpl.scriptengine_task:MakeNamcouple"
