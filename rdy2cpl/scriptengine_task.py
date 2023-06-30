@@ -83,6 +83,9 @@ else:
                     f" and error message '{e.stderr}'"
                 )
             else:
+                self.log_info(
+                    "Grid files, weights and namcouple file created; cleaning temporary OASIS files"
+                )
                 for p in (
                     tmp_namcouple_file,
                     *Path(".").glob("debug.*.??"),
