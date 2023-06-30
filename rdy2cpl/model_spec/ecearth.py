@@ -13,6 +13,10 @@ from rdy2cpl.grids.couple import CoupleGrid
 _log = logging.getLogger(__name__)
 
 
+def invert_mask(grid):
+    grid.mask = np.where(grid.mask == 1, 0, 1)
+
+
 def mask_box(grid, lats, lons):
     "Masks a box spanned by corners (lats[0], lons[0]) and (lats[1], lons[1])"
     grid.mask = np.where(
