@@ -2,6 +2,7 @@ import logging
 from collections import namedtuple
 
 import numpy as np
+from netCDF4 import Dataset
 
 from rdy2cpl.grib import read as grib_read
 from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
@@ -43,6 +44,23 @@ def oifs_read_mask(oifs_grid, icmgginit_file="icmgginit"):
     oifs_grid.mask = np.where(
         np.logical_or(oifs_masks["lsm"] > 0.5, oifs_masks["cl"] > 0.5), 1, 0
     ).reshape(oifs_grid.shape)
+
+
+def rnfm_read_mask(rnfm_grid, runoff_mapper_file="runoff_maps.nc"):
+    """Reads runoff-mapper file and derives mask from drainage basin ids"""
+    try:
+        with Dataset(runoff_mapper_file) as nc:
+            dbi = nc["drainage_basin_id"][...].T
+    except OSError as e:
+        _log.error(f"Could not open/read the runoff-mapper file: {e}")
+        raise
+    except KeyError:
+        _log.error(
+            f"Could not find variable 'drainage_basin_id' in the runoff-mapper file"
+        )
+        raise
+    # convention is that ocean has id==-2
+    rnfm_grid.mask = np.where(dbi == -2, 1, 0)
 
 
 # _base_grid_factory is used below to define all known EC-Earth grids in _ece_grids
