@@ -8,17 +8,26 @@ class Grid:
     type: str
     overlap: int
 
+    def as_dict(self):
+        return {"name": self.name, "type": self.type, "overlap": self.overlap}
+
 
 @dataclass
 class Transformation:
     name: str
     opts: List[str]
 
+    def as_dict(self):
+        return {"name": self.name, "opts": self.opts}
+
 
 @dataclass
 class LinkEndPoint:
     fields: List[str] = field(compare=False)
     grid: Grid
+
+    def as_dict(self):
+        return {"fields": self.fields, "grid": self.grid.as_dict()}
 
 
 @dataclass
@@ -41,8 +50,8 @@ class Link:
             (self.source == other.source)
             and (self.target == other.target)
             and (
-                [t for t in self.transformations if t.name is "SCRIPR"]
-                == [t for t in other.transformations if t.name is "SCRIPR"]
+                [t for t in self.transformations if t.name == "SCRIPR"]
+                == [t for t in other.transformations if t.name == "SCRIPR"]
             )
         )
 
@@ -67,6 +76,18 @@ class Link:
             for opt in t.opts:
                 tlines += f"  {opt}\n"
         return header + first + second + third + tlines
+
+    def as_dict(self):
+        return {
+            "description": self.description,
+            "dt": self.dt,
+            "lag": self.lag,
+            "source": self.source.as_dict(),
+            "target": self.target.as_dict(),
+            "transformations": [t.as_dict() for t in self.transformations],
+            "mode": self.mode,
+            "restart_file": self.restart_file,
+        }
 
 
 @dataclass
@@ -128,3 +149,12 @@ class Namcouple:
     def save(self, name="namcouple"):
         with open(name, "w") as f:
             f.write(str(self))
+
+    def as_dict(self):
+        return {
+            "description": self.description,
+            "runtime": self.runtime,
+            "nlogprt": self.nlogprt,
+            "nnorest": self.nnorest,
+            "links": [l.as_dict() for l in self.links],
+        }
