@@ -1,4 +1,5 @@
 import logging
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -51,15 +52,26 @@ else:
 
             nweights = namcouple.reduced().num_links
 
+            if not shutil.which("srun"):
+                self.log_error(
+                    "SLURM 'srun' command not found (rdy2cp needs a working SLURM environment)"
+                )
+                raise ScriptEngineTaskRunError
+
+            srun_opts = self.getarg(
+                "srun_opts",
+                context,
+                default=[
+                    "--nodes", nweights,
+                    "--ntasks", nweights,
+                    "--ntasks-per-node", 1,
+                ],
+            )
+
             self.log_debug(f"Running r2c using {tmp_namcouple_file}")
             cmd = [
                 "srun",
-                "--nodes",
-                nweights,
-                "--ntasks",
-                nweights,
-                "--ntasks-per-node",
-                1,
+                *srun_opts,
                 "r2c",
                 tmp_namcouple_file,
             ]
