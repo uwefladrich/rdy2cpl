@@ -115,7 +115,10 @@ _ece_grids = {
     "ILCM": _base_grid_factory(Tco159),
     "IOCH": _base_grid_factory(Tco319),
     "ILCH": _base_grid_factory(Tco319),
-    "RNFA": _base_grid_factory(N128, type_kwargs={"transposed": True}),
+    "RNFA": _base_grid_factory(N128, (), {"transposed": True}, ((rnfm_read_mask,),)),
+    "RNFO": _base_grid_factory(
+        N128, (), {"transposed": True}, ((rnfm_read_mask,), (invert_mask,))
+    ),
     "NOUM": _base_grid_factory(
         OrcaUGrid,
         ("domain_cfg.nc",),
