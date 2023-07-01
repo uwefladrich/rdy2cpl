@@ -20,6 +20,7 @@ class RegularLatLonGrid:
         self.start_lat = start_lat
         self.transposed = transposed
         self.t = np.transpose if transposed else lambda x: x
+        self.mask = np.zeros(self.shape)
 
     @property
     def nlats(self):
@@ -91,10 +92,6 @@ class RegularLatLonGrid:
                 (self.nlons, 1),
             ).T
         )
-
-    @property
-    def mask(self):
-        return np.zeros(self.shape)
 
 
 class EquidistantLatLonGrid(RegularLatLonGrid):
