@@ -3,8 +3,8 @@ import logging
 
 from mpi4py import MPI
 
+from rdy2cpl.grids.couple_grid import from_model_spec
 from rdy2cpl.loader import pyoasis
-from rdy2cpl.model_spec.ecearth import couple_grid
 from rdy2cpl.namcouple.factory import from_yaml
 
 _log = logging.getLogger(__name__)
@@ -127,8 +127,8 @@ def main(
         )
         oasis_component = pyoasis.Component(f"worker{rank:02}")
 
-        cpl_grid_source = couple_grid(link.source.grid.name)
-        cpl_grid_target = couple_grid(link.target.grid.name)
+        cpl_grid_source = from_model_spec(link.source.grid.name)
+        cpl_grid_target = from_model_spec(link.target.grid.name)
 
         cpl_grid_source.write()
         cpl_grid_target.write()
