@@ -62,9 +62,12 @@ else:
                 "srun_opts",
                 context,
                 default=[
-                    "--nodes", nweights,
-                    "--ntasks", nweights,
-                    "--ntasks-per-node", 1,
+                    "--nodes",
+                    nweights,
+                    "--ntasks",
+                    nweights,
+                    "--ntasks-per-node",
+                    1,
                 ],
             )
 
@@ -79,9 +82,11 @@ else:
                 subprocess.run(map(str, cmd), capture_output=True, check=True)
             except subprocess.CalledProcessError as e:
                 self.log_error(
-                    f"Failed running r2c: return code is '{e.returncode}'"
-                    f" and error message '{e.stderr}'"
+                    f"Failed running r2c: return code is '{e.returncode}'."
+                    " Full error message follows if loglevel is 'debug'"
                 )
+                self.log_debug(f"Full r2c error message:\n{e.stderr.decode()}")
+                raise ScriptEngineTaskRunError
             else:
                 self.log_info(
                     "Grid files, weights and namcouple file created; cleaning temporary OASIS files"
