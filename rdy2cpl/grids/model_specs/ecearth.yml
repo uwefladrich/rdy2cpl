@@ -1,10 +1,5 @@
 # EC-Earth4 couple grid descriptions for rdy2cpl
 
-AMIP:
-  type:
-    name: EquidistantLatLonGrid
-    args: [100, 200]
-
 RNFA:
   type:
     name: N128
