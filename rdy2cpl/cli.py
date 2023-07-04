@@ -52,13 +52,6 @@ def parse_cmdl_args():
         action="store_true",
         dest="reduced_namcouple_only",
     )
-    #   mgroup.add_argument(
-    #       "-g",
-    #       "--grids",
-    #       help="create namcouple and grid files (grids, masks, areas)",
-    #       action="store_true",
-    #       dest="grids_only",
-    #   )
     parser.add_argument(
         "spec_file",
         help="YAML file with namcouple specification",
@@ -72,7 +65,6 @@ def main(
     print_number_of_links,
     namcouple_only,
     reduced_namcouple_only,
-    #   grids_only,
 ):
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
