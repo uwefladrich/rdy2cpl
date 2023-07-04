@@ -54,7 +54,7 @@ def parse_cmdl_args():
     )
     parser.add_argument(
         "-c",
-        "--couple_grid_spec",
+        "--couple-grid-spec",
         help="Use a couple grid spec file instead of the built-in definitions",
     )
     parser.add_argument(

@@ -77,7 +77,7 @@ else:
             couple_grid_spec = self.getarg("couple_grid_spec", context, default=None)
             if couple_grid_spec is not None:
                 self.log_info(f"Reading couple grid spec from {couple_grid_spec}")
-                cmd.extend(["--couple_grid_spec", couple_grid_spec])
+                cmd.extend(["--couple-grid-spec", couple_grid_spec])
             cmd.append(tmp_namcouple_file)
 
             try:
