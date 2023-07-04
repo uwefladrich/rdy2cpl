@@ -72,12 +72,14 @@ else:
             )
 
             self.log_debug(f"Running r2c using {tmp_namcouple_file}")
-            cmd = [
-                "srun",
-                *srun_opts,
-                "r2c",
-                tmp_namcouple_file,
-            ]
+
+            cmd = ["srun", *srun_opts, "r2c"]
+            couple_grid_spec = self.getarg("couple_grid_spec", context, default=None)
+            if couple_grid_spec is not None:
+                self.log_info(f"Reading couple grid spec from {couple_grid_spec}")
+                cmd.extend(["--couple_grid_spec", couple_grid_spec])
+            cmd.append(tmp_namcouple_file)
+
             try:
                 subprocess.run(map(str, cmd), capture_output=True, check=True)
             except subprocess.CalledProcessError as e:
