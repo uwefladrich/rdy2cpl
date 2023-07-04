@@ -3,7 +3,7 @@ import logging
 
 from mpi4py import MPI
 
-from rdy2cpl.grids.couple_grid import from_model_spec
+from rdy2cpl.grids.couple_grid import from_model_spec, update_model_spec
 from rdy2cpl.loader import pyoasis
 from rdy2cpl.namcouple.factory import from_yaml
 
@@ -53,25 +53,31 @@ def parse_cmdl_args():
         dest="reduced_namcouple_only",
     )
     parser.add_argument(
-        "spec_file",
+        "-c",
+        "--couple_grid_spec",
+        help="Use a couple grid spec file instead of the built-in definitions",
+    )
+    parser.add_argument(
+        "namcouple_spec_file",
         help="YAML file with namcouple specification",
     )
     return parser.parse_args()
 
 
 def main(
-    spec_file,
+    namcouple_spec_file,
     *,
     print_number_of_links,
     namcouple_only,
     reduced_namcouple_only,
+    couple_grid_spec,
 ):
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
 
     try:
-        with open(spec_file) as f:
+        with open(namcouple_spec_file) as f:
             namcouple_spec = f.read()
     except OSError as e:
         _log.error(f"Could not open/read namcouple spec file: {e}")
@@ -118,6 +124,15 @@ def main(
             f"{link.source.grid.name} --> {link.target.grid.name}"
         )
         oasis_component = pyoasis.Component(f"worker{rank:02}")
+
+        if couple_grid_spec is not None:
+            try:
+                if rank == 0:
+                    _log.info(f"Read couple grid spec from {couple_grid_spec}")
+                update_model_spec(model_spec_file=couple_grid_spec)
+            except OSError as e:
+                _log.error(f"Could not open/read couple grid spec file: {e}")
+                return
 
         cpl_grid_source = from_model_spec(link.source.grid.name)
         cpl_grid_target = from_model_spec(link.target.grid.name)
