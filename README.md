@@ -108,6 +108,38 @@ subdirectory. Please refer to these examples for the YAML form of the coupling
 information that is needed for `r2c`.
 
 
+## Using the `rdy2cpl` ScriptEngine tasks
+
+The main functions of `r2c` are provided as
+[ScriptEngine](https://scriptengine.readthedocs.io) tasks.
+To just create the `namcouple` file (same as running `r2c -n`), use:
+```yaml
+rdy2cpl.make_namcouple:
+  namcouple: <NAMCOUPLE_SPEC_FILE>
+```
+
+Create everything; grid description, `namcouple` and weight files:
+```yaml
+rdy2cpl.make_all:
+  namcouple: <NAMCOUPLE_SPEC_FILE>
+  couple_grid_spec: <COUPLE_GRID_SPEC_FILE>  # optional
+  srun_opts: <LIST_OF_SRUN_OPTS>  # optional
+```
+If the `couple_grid_spec` argument is used, the given YAML file is used to
+define the couple grids, instead of the built-in definitions.
+
+This task runs `r2c` through the SLURM `srun` command, with one node allocated
+per coupling weight file (indicated by `NWEIGHTS` below), as returned bu `r2c
+-l`. Internally, it uses the command line
+```
+srun --nodes <NWEIGHTS> --ntasks <NWEIGHTS> --ntasks-per-node 1 \
+  r2c [--couple-grid-spec <COUPLE_GRID_SPEC_FILE>] <NAMCOUPLE_SPEC_FILE>
+```
+The default `srun` options given above can be overwritten by using the
+`srun_opts` argument of the `rdy2cpl.make_all` task, which takes a list of
+replacement options.
+
+
 ## Possible issues
 
 ### MPI for Python (`mpi4py`)
