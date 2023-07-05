@@ -1,0 +1,63 @@
+# EC-Earth4 couple grid descriptions for rdy2cpl
+
+RNFA:
+  type:
+    name: N128
+    kwargs:
+      transposed: true
+  mask_modifiers:
+    - name: rnfm_read_mask
+
+RNFO:
+  type:
+    name: N128
+    kwargs:
+      transposed: true
+  mask_modifiers:
+    - name: rnfm_read_mask
+    - name: invert_mask
+
+ILLL:
+  type:
+    name: Tl159
+  mask_modifiers:
+    - name: oifs_read_mask
+      args: [icmgginit]
+
+IOLL:
+  type:
+    name: Tl159
+  mask_modifiers:
+    - name: oifs_read_mask
+      args: [icmgginit]
+    - name: invert_mask
+
+NETM:
+  type:
+    name: OrcaTGrid
+    args: [domain_cfg.nc]
+  mask_modifiers:
+    - {name: mask_box, args: [[36, 48], [46, 56]]} # Caspian sea
+    - {name: mask_box, args: [[41, 48], [27, 43]]} # Black sea
+    - {name: mask_box, args: [[41, 50], [-93, -76]]} # Great lakes
+    - {name: mask_box, args: [[-3, 1], [31.5, 35]]} # Lake Victoria
+
+NEUM:
+  type:
+    name: OrcaUGrid
+    args: [domain_cfg.nc]
+  mask_modifiers:
+    - {name: mask_box, args: [[36, 48], [46, 56]]} # Caspian sea
+    - {name: mask_box, args: [[41, 48], [27, 43]]} # Black sea
+    - {name: mask_box, args: [[41, 50], [-93, -76]]} # Great lakes
+    - {name: mask_box, args: [[-3, 1], [31.5, 35]]} # Lake Victoria
+
+NEVM:
+  type:
+    name: OrcaVGrid
+    args: [domain_cfg.nc]
+  mask_modifiers:
+    - {name: mask_box, args: [[36, 48], [46, 56]]} # Caspian sea
+    - {name: mask_box, args: [[41, 48], [27, 43]]} # Black sea
+    - {name: mask_box, args: [[41, 50], [-93, -76]]} # Great lakes
+    - {name: mask_box, args: [[-3, 1], [31.5, 35]]} # Lake Victoria
