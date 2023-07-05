@@ -17,19 +17,20 @@ RNFO:
     - name: rnfm_read_mask
     - name: invert_mask
 
-IOCL:
-  type:
-    name: Tco95
-  mask_modifiers:
-    - name: oifs_read_mask
-      args: [icmgginit]
-
 ILLL:
   type:
     name: Tl159
   mask_modifiers:
     - name: oifs_read_mask
       args: [icmgginit]
+
+IOLL:
+  type:
+    name: Tl159
+  mask_modifiers:
+    - name: oifs_read_mask
+      args: [icmgginit]
+    - name: invert_mask
 
 NETM:
   type:
