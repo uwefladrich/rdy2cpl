@@ -62,12 +62,9 @@ else:
                 "srun_opts",
                 context,
                 default=[
-                    "--nodes",
-                    nweights,
-                    "--ntasks",
-                    nweights,
-                    "--ntasks-per-node",
-                    1,
+                    "--nodes", nweights,
+                    "--ntasks", nweights,
+                    "--ntasks-per-node", 1,
                 ],
             )
 
