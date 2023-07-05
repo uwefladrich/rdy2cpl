@@ -101,8 +101,8 @@ def main(
         return
 
     if rank == 0:
+        _log.info("Writing reduced namcouple file")
         try:
-            _log.info("Writing reduced namcouple file")
             namcouple.reduced().save()
         except OSError as e:
             _log.error(f"Could not write reduced namcouple file: {e}")
@@ -126,9 +126,9 @@ def main(
         oasis_component = pyoasis.Component(f"worker{rank:02}")
 
         if couple_grid_spec is not None:
+            if rank == 0:
+                _log.info(f"Read couple grid spec from {couple_grid_spec}")
             try:
-                if rank == 0:
-                    _log.info(f"Read couple grid spec from {couple_grid_spec}")
                 update_model_spec(model_spec_file=couple_grid_spec)
             except OSError as e:
                 _log.error(f"Could not open/read couple grid spec file: {e}")
