@@ -36,6 +36,7 @@ class Link:
     target: LinkEndPoint
     dt: int
     description: str = field(default=None)
+    active: bool = field(default=True)
     transformations: List[Transformation] = field(default_factory=list)
     lag: int = field(default=0)
     mode: str = field(default="EXPORTED")
@@ -80,6 +81,7 @@ class Link:
     def as_dict(self):
         return {
             "description": self.description,
+            "active": self.active,
             "dt": self.dt,
             "lag": self.lag,
             "source": self.source.as_dict(),
@@ -112,7 +114,7 @@ class Namcouple:
         )
         unique_links = []
         for lnk in self.links:
-            if lnk not in unique_links:
+            if lnk.active and lnk not in unique_links:
                 unique_links.append(lnk)
                 rn.links.append(
                     Link(
@@ -142,7 +144,7 @@ class Namcouple:
             f"{global_parameter('NNOREST', 'True' if self.nnorest else 'False')}"
             "$STRINGS\n\n"
         )
-        links = "\n".join([str(link) for link in self.links])
+        links = "\n".join([str(link) for link in self.links if link.active])
         footer = "\n$END\n"
         return title + header + links + footer
 

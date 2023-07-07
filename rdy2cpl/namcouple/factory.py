@@ -15,6 +15,7 @@ def from_dict(thedict):
         links=[
             Link(
                 description=link.get("description"),
+                active=link.get("active", True),
                 dt=link["dt"],
                 lag=link.get("lag", 0),
                 mode=link.get("mode", "EXPORTED"),
