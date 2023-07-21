@@ -1,5 +1,7 @@
 # EC-Earth4 couple grid descriptions for rdy2cpl
 
+# Runoff-mapper grid, based on regular Gauss grid N128, reads mask from
+# 'runoff_maps.nc' i.e. ocean is masked
 RNFA:
   type:
     name: N128
@@ -7,7 +9,10 @@ RNFA:
       transposed: true
   mask_modifiers:
     - name: rnfm_read_mask
+      args: [runoff_maps.nc]
 
+# Runoff-mapper grid, based on regular Gauss grid N128, reads mask from
+# 'runoff_maps.nc' and inverts, i.e. land is masked
 RNFO:
   type:
     name: N128
@@ -15,8 +20,11 @@ RNFO:
       transposed: true
   mask_modifiers:
     - name: rnfm_read_mask
+      args: [runoff_maps.nc]
     - name: invert_mask
 
+# OIFS TL159 grid, read land-sea mask from 'icmgginit' file,
+# i.e. land is masked
 ILLL:
   type:
     name: Tl159
@@ -24,6 +32,8 @@ ILLL:
     - name: oifs_read_mask
       args: [icmgginit]
 
+# OIFS TL159 grid, read land-sea mask from 'icmgginit' file and inverts,
+# i.e. sea is masked
 IOLL:
   type:
     name: Tl159
@@ -32,32 +42,35 @@ IOLL:
       args: [icmgginit]
     - name: invert_mask
 
+# NEMO eORCA1 T-grid, reads coordinates from 'domain_cfg.nc' and mask from
+# 'maskutil.nc'; masks some closed seas
 NETM:
   type:
     name: OrcaTGrid
-    args: [domain_cfg.nc]
+    args: [domain_cfg.nc, maskutil.nc]
   mask_modifiers:
-    - {name: mask_box, args: [[36, 48], [46, 56]]} # Caspian sea
-    - {name: mask_box, args: [[41, 48], [27, 43]]} # Black sea
-    - {name: mask_box, args: [[41, 50], [-93, -76]]} # Great lakes
-    - {name: mask_box, args: [[-3, 1], [31.5, 35]]} # Lake Victoria
+    - { name: mask_box, args: [[36, 48], [46, 56]] } # Caspian sea
+    - { name: mask_box, args: [[41, 50], [-93, -76]] } # Great lakes
+    - { name: mask_box, args: [[-3, 1], [31.5, 35]] } # Lake Victoria
 
+# NEMO eORCA1 U-grid, reads coordinates from 'domain_cfg.nc' and mask from
+# 'maskutil.nc'; masks some closed seas
 NEUM:
   type:
     name: OrcaUGrid
-    args: [domain_cfg.nc]
+    args: [domain_cfg.nc, maskutil.nc]
   mask_modifiers:
-    - {name: mask_box, args: [[36, 48], [46, 56]]} # Caspian sea
-    - {name: mask_box, args: [[41, 48], [27, 43]]} # Black sea
-    - {name: mask_box, args: [[41, 50], [-93, -76]]} # Great lakes
-    - {name: mask_box, args: [[-3, 1], [31.5, 35]]} # Lake Victoria
+    - { name: mask_box, args: [[36, 48], [46, 56]] } # Caspian sea
+    - { name: mask_box, args: [[41, 50], [-93, -76]] } # Great lakes
+    - { name: mask_box, args: [[-3, 1], [31.5, 35]] } # Lake Victoria
 
+# NEMO eORCA1 V-grid, reads coordinates from 'domain_cfg.nc' and mask from
+# 'maskutil.nc'; masks some closed seas
 NEVM:
   type:
     name: OrcaVGrid
-    args: [domain_cfg.nc]
+    args: [domain_cfg.nc, maskutil.nc]
   mask_modifiers:
-    - {name: mask_box, args: [[36, 48], [46, 56]]} # Caspian sea
-    - {name: mask_box, args: [[41, 48], [27, 43]]} # Black sea
-    - {name: mask_box, args: [[41, 50], [-93, -76]]} # Great lakes
-    - {name: mask_box, args: [[-3, 1], [31.5, 35]]} # Lake Victoria
+    - { name: mask_box, args: [[36, 48], [46, 56]] } # Caspian sea
+    - { name: mask_box, args: [[41, 50], [-93, -76]] } # Great lakes
+    - { name: mask_box, args: [[-3, 1], [31.5, 35]] } # Lake Victoria
