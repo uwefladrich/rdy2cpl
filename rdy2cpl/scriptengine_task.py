@@ -1,6 +1,7 @@
 import logging
 import shutil
 import subprocess
+from dataclasses import asdict
 from pathlib import Path
 
 import yaml
@@ -43,7 +44,7 @@ else:
             )
             try:
                 with open(tmp_namcouple_file, "w") as f:
-                    f.write(yaml.safe_dump(namcouple.as_dict()))
+                    f.write(yaml.safe_dump(asdict(namcouple)))
             except OSError as e:
                 self.log_error(
                     f"Could not open/write the temporary namcouple spec file: {e}"
