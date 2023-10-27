@@ -95,10 +95,19 @@ class RegularLatLonGrid:
 
 
 class EquidistantLatLonGrid(RegularLatLonGrid):
-    def __init__(self, nlats, nlons, *, start_lat=-90, transposed=False):
+    def __init__(
+        self,
+        nlats,
+        nlons,
+        *,
+        start_lat=-90,
+        start_lon=0,
+        center_lons=False,
+        transposed=False,
+    ):
         super().__init__(
             equidistant(start_lat, -start_lat, nlats),
-            equidistant(0, 360, nlons, center_at_start=True),
+            equidistant(start_lon, start_lon + 360, nlons, center_at_start=center_lons),
             start_lat=start_lat,
             transposed=transposed,
         )
