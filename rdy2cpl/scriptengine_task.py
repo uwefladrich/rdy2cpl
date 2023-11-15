@@ -1,4 +1,5 @@
 import logging
+import os
 import shutil
 import subprocess
 from dataclasses import asdict
@@ -63,13 +64,13 @@ else:
                 "srun_opts",
                 context,
                 default=[
-                    "--nodes", nweights,
                     "--ntasks", nweights,
-                    "--ntasks-per-node", 1,
+                    "--cpus-per-task",
+                    os.environ.get(
+                        "OMP_NUM_THREADS", os.environ.get("OASIS_OMP_NUM_THREADS", "1")
+                    ),
                 ],
             )
-
-            self.log_debug(f"Running r2c using {tmp_namcouple_file}")
 
             cmd = ["srun", *srun_opts, "r2c"]
             couple_grid_spec = self.getarg("couple_grid_spec", context, default=None)
@@ -77,6 +78,8 @@ else:
                 self.log_info(f"Reading couple grid spec from {couple_grid_spec}")
                 cmd.extend(["--couple-grid-spec", couple_grid_spec])
             cmd.append(tmp_namcouple_file)
+
+            self.log_debug(f"Full r2c command line: {''.join(map(str, cmd))}")
 
             try:
                 subprocess.run(map(str, cmd), capture_output=True, check=True)
