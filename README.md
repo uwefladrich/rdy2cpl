@@ -128,11 +128,13 @@ rdy2cpl.make_all:
 If the `couple_grid_spec` argument is used, the given YAML file is used to
 define the couple grids, instead of the built-in definitions.
 
-This task runs `r2c` through the SLURM `srun` command, with one node allocated
-per coupling weight file (indicated by `NWEIGHTS` below), as returned bu `r2c
--l`. Internally, it uses the command line
+This task runs `r2c` through the SLURM `srun` command, with one MPI task per
+coupling weight file (indicated by `NWEIGHTS` below), as returned by `r2c -l`.
+Additionally, it allocates cores for OpenMP parallelisation, if
+``OMP_NUM_THREAD`` is set. Internally, it uses the command line
 ```
-srun --nodes <NWEIGHTS> --ntasks <NWEIGHTS> --ntasks-per-node 1 \
+srun \
+  --ntasks <NWEIGHTS> --cpus-per-task <OMP_NUM_THREAD or OASIS_OMP_NUM_THREADS or 1> \
   r2c [--couple-grid-spec <COUPLE_GRID_SPEC_FILE>] <NAMCOUPLE_SPEC_FILE>
 ```
 The default `srun` options given above can be overwritten by using the
