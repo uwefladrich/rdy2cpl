@@ -1,8 +1,14 @@
 # Python environments
 /.conda/
 
-# Python files
+# Python files (including packaging)
 __pycache__/
+build/
+dist/
+sdist/
+wheels/
+*.egg-info/
+*.egg
 
 # Python notebooks
 *.ipynb
