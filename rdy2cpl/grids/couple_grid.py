@@ -7,7 +7,7 @@ from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
 from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
 from rdy2cpl.grids.base.regular_gaussian import N128
 from rdy2cpl.grids.base.tco import Tco95, Tco159, Tco319, Tco399
-from rdy2cpl.grids.base.tl import Tl63, Tl159, Tl255
+from rdy2cpl.grids.base.tl import Tl63, Tl159, Tl255, Tl511
 from rdy2cpl.grids.mask_modifiers import (
     invert_mask,
     mask_box,
@@ -31,6 +31,7 @@ _base_grids = {
         Tl63,
         Tl159,
         Tl255,
+        Tl511,
         Tco95,
         Tco159,
         Tco319,
