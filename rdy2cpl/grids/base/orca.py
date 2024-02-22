@@ -10,6 +10,7 @@ def _check(subgrid):
 
 
 _orca_names = {
+    (180, 148, 31): "ORCA2L31",
     (362, 292, 75): "ORCA1L75",
     (360, 331, 75): "eORCA1L75",
 }
