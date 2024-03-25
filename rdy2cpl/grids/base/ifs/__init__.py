@@ -1,3 +1,5 @@
+from .F128 import F128
+
 from .N32 import N32
 from .N80 import N80
 from .N128 import N128
