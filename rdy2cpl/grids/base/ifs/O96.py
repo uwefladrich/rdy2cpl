@@ -1,7 +1,7 @@
 from rdy2cpl.grids.base.reduced_gaussian import ReducedGaussianGrid
 
 
-class Tco95(ReducedGaussianGrid):
+class O96(ReducedGaussianGrid):
     def __init__(self):
         super().__init__(_lats, _nlons)
 
