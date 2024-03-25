@@ -1,8 +1,8 @@
-from .regular import RegularLatLonGrid
-from .utils import equidistant
+from rdy2cpl.grids.base.regular import RegularLatLonGrid
+from rdy2cpl.grids.base.utils import equidistant
 
 
-class N128(RegularLatLonGrid):
+class F128(RegularLatLonGrid):
     def __init__(self, transposed=False):
         super().__init__(
             _lats_n128,
