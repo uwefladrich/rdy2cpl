@@ -3,11 +3,21 @@ from pathlib import Path
 
 import yaml
 
-from rdy2cpl.grids.base.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
+from rdy2cpl.grids.base.ifs import (
+    F128,
+    N32,
+    N80,
+    N128,
+    N256,
+    O96,
+    O160,
+    O200,
+    O320,
+    O400,
+    O1280,
+)
+from rdy2cpl.grids.base.nemo.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
 from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
-from rdy2cpl.grids.base.regular_gaussian import N128
-from rdy2cpl.grids.base.tco import Tco95, Tco159, Tco199, Tco319, Tco399, Tco1279
-from rdy2cpl.grids.base.tl import Tl63, Tl159, Tl255, Tl511
 from rdy2cpl.grids.mask_modifiers import (
     invert_mask,
     mask_box,
@@ -24,20 +34,20 @@ _base_grids = {
     bg.__name__: bg
     for bg in (
         EquidistantLatLonGrid,
-        N128,
         OrcaTGrid,
         OrcaUGrid,
         OrcaVGrid,
-        Tl63,
-        Tl159,
-        Tl255,
-        Tl511,
-        Tco95,
-        Tco159,
-        Tco199,
-        Tco319,
-        Tco399,
-        Tco1279,
+        F128,
+        N32,
+        N80,
+        N128,
+        N256,
+        O96,
+        O160,
+        O200,
+        O320,
+        O400,
+        O1280,
     )
 }
 
