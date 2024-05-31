@@ -3,6 +3,8 @@ from .F128 import F128
 from .N32 import N32
 from .N80 import N80
 from .N128 import N128
+from .N160 import N160
+from .N200 import N200
 from .N256 import N256
 
 from .O96 import O96
