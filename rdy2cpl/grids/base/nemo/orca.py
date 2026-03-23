@@ -14,6 +14,9 @@ _orca_names = {
     (180, 148, 31): "ORCA2L31",
     (362, 292, 75): "ORCA1L75",
     (360, 331, 75): "eORCA1L75",
+    (722, 604, 75): "eORCA05L75",
+    (1440, 1206, 75): "eORCA025L75",
+    (4320, 3605, 75): "eORCA12L75",
 }
 
 
@@ -27,7 +30,14 @@ class OrcaGrid:
             try:
                 ni = nc.dimensions["x"].size
                 nj = nc.dimensions["y"].size
-                nk = nc.dimensions["z"].size
+                if "z" in nc.dimensions.keys():
+                    nk = nc.dimensions["z"].size
+                elif "nav_lev" in nc.dimensions.keys():
+                    nk = nc.dimensions["nav_lev"].size
+                else:
+                    print(
+                        " Looked for z and nav_lev dimension in domain_cfg but did not find either"
+                    )
             except KeyError:
                 raise RuntimeError("Missing dimensions in NEMO domain config")
 
