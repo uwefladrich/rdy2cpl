@@ -19,11 +19,13 @@ from rdy2cpl.grids.base.ifs import (
     O1280,
 )
 from rdy2cpl.grids.base.nemo.orca import OrcaTGrid, OrcaUGrid, OrcaVGrid
+from rdy2cpl.grids.base.pism import PismGrid
 from rdy2cpl.grids.base.regular import EquidistantLatLonGrid
 from rdy2cpl.grids.mask_modifiers import (
     invert_mask,
     mask_box,
     oifs_read_mask,
+    pism_read_mask,
     rnfm_read_mask,
 )
 from rdy2cpl.loader import _import_pyoasis
@@ -39,6 +41,7 @@ _base_grids = {
         OrcaTGrid,
         OrcaUGrid,
         OrcaVGrid,
+        PismGrid,
         F128,
         N32,
         N80,
@@ -56,7 +59,8 @@ _base_grids = {
 }
 
 _mask_modifiers = {
-    f.__name__: f for f in (invert_mask, mask_box, oifs_read_mask, rnfm_read_mask)
+    f.__name__: f
+    for f in (invert_mask, mask_box, oifs_read_mask, pism_read_mask, rnfm_read_mask)
 }
 
 _default_model_spec_file = Path(__file__).parent / "model_specs/ecearth.yml"

@@ -40,6 +40,22 @@ def oifs_read_mask(oifs_grid, icmgginit_file="icmgginit"):
     ).reshape(oifs_grid.shape)
 
 
+def pism_read_mask(grid, coverage):
+    """Set mask from PISM ice-area-fraction data stored in the grid object.
+
+    coverage: 'land' masks ice-free points (ice/land-ice points active),
+              'ocean' masks ice-covered points (ice-free points active).
+    """
+    if not hasattr(grid, "_mask_data") or grid._mask_data is None:
+        raise RuntimeError("PismGrid was created without mask data")
+    if coverage == "ocean":
+        grid.mask = np.where(grid._mask_data != 0, 1, 0)
+    elif coverage == "land":
+        grid.mask = np.where(grid._mask_data == 0, 1, 0)
+    else:
+        raise ValueError(f"Unknown PISM mask coverage: {coverage}")
+
+
 def rnfm_read_mask(rnfm_grid, runoff_mapper_file="runoff_maps.nc"):
     """Reads runoff-mapper file and derives mask from drainage basin ids"""
     try:
