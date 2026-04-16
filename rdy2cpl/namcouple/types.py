@@ -80,7 +80,7 @@ class Namcouple:
 
     @property
     def num_links(self):
-        return len(self.links)
+        return sum(link.active for link in self.links)
 
     def reduced(self):
         """Returns the reduced namcouple version, with unique links"""
