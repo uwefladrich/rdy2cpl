@@ -9,6 +9,8 @@ _log = logging.getLogger(__name__)
 
 
 def invert_mask(grid):
+    if hasattr(grid, '_ifs_lsm'):
+        grid.fractions = grid._ifs_lsm
     grid.mask = np.where(grid.mask == 1, 0, 1)
 
 
@@ -35,6 +37,7 @@ def oifs_read_mask(oifs_grid, icmgginit_file="icmgginit"):
     except (FileNotFoundError, PermissionError) as e:
         _log.error(f'Could not open OIFS mask file "{icmgginit_file}"')
         raise e from None
+    oifs_grid._ifs_lsm = oifs_masks["lsm"].reshape(oifs_grid.shape)
     oifs_grid.mask = np.where(
         np.logical_or(oifs_masks["lsm"] > 0.5, oifs_masks["cl"] > 0.5), 1, 0
     ).reshape(oifs_grid.shape)
