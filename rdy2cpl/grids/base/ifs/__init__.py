@@ -7,6 +7,7 @@ from .N160 import N160
 from .N200 import N200
 from .N256 import N256
 
+from .O80 import O80
 from .O96 import O96
 from .O160 import O160
 from .O200 import O200
