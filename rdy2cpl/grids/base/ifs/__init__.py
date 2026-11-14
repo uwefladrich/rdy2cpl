@@ -1,3 +1,4 @@
+from .F16 import F16
 from .F128 import F128
 from .N32 import N32
 from .N80 import N80
@@ -14,6 +15,7 @@ from .O400 import O400
 from .O1280 import O1280
 
 __all__ = [
+    "F16",
     "F128",
     "N32",
     "N80",
