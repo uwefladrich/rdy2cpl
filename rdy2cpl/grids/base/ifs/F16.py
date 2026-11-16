@@ -5,7 +5,7 @@ from rdy2cpl.grids.base.utils import equidistant
 class F16(RegularLatLonGrid):
     """Full (regular) Gaussian grid F16 (32 x 64), e.g. OpenIFS TL21"""
 
-    def __init__(self, transposed=True):
+    def __init__(self, transposed=False):
         # Latitudes run north to south, as in ICMGG files
         super().__init__(
             _lats,
