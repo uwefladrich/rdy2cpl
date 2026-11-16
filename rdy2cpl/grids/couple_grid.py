@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 
 from rdy2cpl.grids.base.ifs import (
+    F16,
     F128,
     N32,
     N80,
@@ -43,6 +44,7 @@ _base_grids = {
         OrcaUGrid,
         OrcaVGrid,
         PismGrid,
+        F16,
         F128,
         N32,
         N80,

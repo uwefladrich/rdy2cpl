@@ -35,9 +35,12 @@ def oifs_read_mask(oifs_grid, icmgginit_file="icmgginit"):
     except (FileNotFoundError, PermissionError) as e:
         _log.error(f'Could not open OIFS mask file "{icmgginit_file}"')
         raise e from None
-    oifs_grid.mask = np.where(
+    mask = np.where(
         np.logical_or(oifs_masks["lsm"] > 0.5, oifs_masks["cl"] > 0.5), 1, 0
-    ).reshape(oifs_grid.shape)
+    )
+    if hasattr(oifs_grid, "t"):  # full grid: GRIB points are (lat, lon)
+        mask = oifs_grid.t(mask.reshape(oifs_grid.nlats, oifs_grid.nlons))
+    oifs_grid.mask = mask.reshape(oifs_grid.shape)
 
 
 def pism_read_mask(grid, coverage):
