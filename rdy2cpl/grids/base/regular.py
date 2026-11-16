@@ -54,6 +54,8 @@ class RegularLatLonGrid:
     def corner_latitudes(self):
         n_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="u")
         s_lats = interval_bounds(self.start_lat, self.lats, -self.start_lat, loc="l")
+        if self.lats[0] > self.lats[-1]:  # north to south: upper bound is south
+            n_lats, s_lats = s_lats, n_lats
         return np.transpose(
             [
                 self.t(np.tile(n_lats, (self.nlons, 1)).T),  # 1 ---- 0

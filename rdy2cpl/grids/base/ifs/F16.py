@@ -1,11 +1,18 @@
-from rdy2cpl.grids.base.reduced_gaussian import ReducedGaussianGrid
+from rdy2cpl.grids.base.regular import RegularLatLonGrid
+from rdy2cpl.grids.base.utils import equidistant
 
 
-class F16(ReducedGaussianGrid):
-    """Regular (full) Gaussian grid N16 (32 x 64), e.g. OpenIFS TL21"""
+class F16(RegularLatLonGrid):
+    """Full (regular) Gaussian grid F16 (32 x 64), e.g. OpenIFS TL21"""
 
-    def __init__(self):
-        super().__init__(_lats, _nlons)
+    def __init__(self, transposed=True):
+        # Latitudes run north to south, as in ICMGG files
+        super().__init__(
+            _lats,
+            equidistant(0, 360, 64, center_at_start=True),
+            start_lat=90,
+            transposed=transposed,
+        )
 
 
 _lats = (
@@ -17,5 +24,3 @@ _lats = (
     -52.6065260343453, -58.1429540492033, -63.6786355610969, -69.2129761693708, -74.7445403686358,
     -80.26877907225, -85.7605871204438,
 )
-
-_nlons = (64,) * 32
